@@ -3,127 +3,202 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grade 11 Early Admission & AP Predictor</title>
-    <!-- External Modular CSS File -->
+    <title>Grade 11 Early Admission & 30-AP Fast-Track Predictor</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <div class="container">
+        <!-- Header Section -->
+        <header class="main-header">
+            <h1>Grade 11 Early Admission Predictor</h1>
+            <p>Calculates conditional early offer probability for Alberta universities using completed Grade 12 (30-level) fast-tracked credits and 20-level prerequisites.</p>
+        </header>
 
-<div class="container">
-    <header class="main-header">
-        <h1>Grade 11 Early Admission Predictor</h1>
-        <p>Evaluate your early university admission chances using 20-level course marks and AP rigor weightings.</p>
-    </header>
-
-    <main class="calculator-layout">
-        <!-- Input Panel -->
-        <section class="card input-card">
+        <!-- Main Form Input Card -->
+        <main class="card">
             <div class="section-title">
-                <h2>Grade 11 Prerequisites (20-Level)</h2>
-                <span class="badge-info">Early Wave Focus</span>
+                <h2>Transcript & Course Inputs</h2>
+                <span class="badge-info">Algorithmic Evaluator v2.0</span>
             </div>
-
             <p class="section-description">
-                Toggle courses to <strong>AP Version</strong> if you took an AP-prep module or AP exam in Grade 11. Adjust both sliders and number inputs in real time.
+                Enter your final or current percentages. 30-level courses completed early in Grade 11 carry superior weight and override 20-level placeholders in early admission rounds.
             </p>
 
             <form id="admissionForm" onsubmit="event.preventDefault();">
                 <div class="subject-grid">
                     
-                    <!-- Subject 1: ELA 20-1 -->
+                    <!-- Subject 1: Math 30-1 / Math 30-AP (Override Senior Credit) -->
+                    <div class="subject-row senior-credit-row" id="row-math30_1">
+                        <div class="subject-info">
+                            <div class="subject-header-tags">
+                                <span class="subject-name">Math 30-1 / Math 30-AP</span>
+                                <span class="badge-senior">Grade 12 Credit Locked</span>
+                            </div>
+                            <span class="subject-meta">Replaces Math 20-1 | Completed Senior Math Credit</span>
+                        </div>
+                        <div class="controls-group">
+                            <button type="button" 
+                                    id="btn-math30_1" 
+                                    class="toggle-btn" 
+                                    onclick="toggleAP('math30_1')"
+                                    aria-pressed="false">
+                                Standard (-1)
+                            </button>
+                            <div class="input-controls">
+                                <input type="range" 
+                                       id="slider-math30_1" 
+                                       class="grade-slider senior-slider" 
+                                       min="0" 
+                                       max="100" 
+                                       value="85" 
+                                       oninput="syncFromSlider('math30_1')">
+                                <div class="grade-input-wrapper">
+                                    <input type="number" 
+                                           id="grade-math30_1" 
+                                           min="0" 
+                                           max="100" 
+                                           value="85" 
+                                           oninput="syncFromInput('math30_1')">
+                                    <span class="unit">%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Subject 2: ELA 20-1 -->
                     <div class="subject-row" id="row-ela20">
                         <div class="subject-info">
-                            <label for="grade-ela20" class="subject-name">ELA 20-1</label>
-                            <span class="subject-meta">Required Core • Weight: 1.00x</span>
+                            <span class="subject-name">ELA 20-1</span>
+                            <span class="subject-meta">Core Prerequisite | Grade 11 Humanities</span>
                         </div>
                         <div class="controls-group">
-                            <button type="button" class="toggle-btn" id="btn-ela20" onclick="toggleAP('ela20')">
+                            <button type="button" 
+                                    id="btn-ela20" 
+                                    class="toggle-btn" 
+                                    onclick="toggleAP('ela20')"
+                                    aria-pressed="false">
                                 Standard (-1)
                             </button>
                             <div class="input-controls">
-                                <input type="range" class="grade-slider" id="slider-ela20" min="0" max="100" value="82" oninput="syncFromSlider('ela20')">
+                                <input type="range" 
+                                       id="slider-ela20" 
+                                       class="grade-slider" 
+                                       min="0" 
+                                       max="100" 
+                                       value="80" 
+                                       oninput="syncFromSlider('ela20')">
                                 <div class="grade-input-wrapper">
-                                    <input type="number" id="grade-ela20" min="0" max="100" value="82" oninput="syncFromInput('ela20')">
+                                    <input type="number" 
+                                           id="grade-ela20" 
+                                           min="0" 
+                                           max="100" 
+                                           value="80" 
+                                           oninput="syncFromInput('ela20')">
                                     <span class="unit">%</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Subject 2: Math 20-1 -->
-                    <div class="subject-row" id="row-math20_1">
-                        <div class="subject-info">
-                            <label for="grade-math20_1" class="subject-name">Math 20-1</label>
-                            <span class="subject-meta">STEM Core • Weight: 1.25x</span>
-                        </div>
-                        <div class="controls-group">
-                            <button type="button" class="toggle-btn" id="btn-math20_1" onclick="toggleAP('math20_1')">
-                                Standard (-1)
-                            </button>
-                            <div class="input-controls">
-                                <input type="range" class="grade-slider" id="slider-math20_1" min="0" max="100" value="88" oninput="syncFromSlider('math20_1')">
-                                <div class="grade-input-wrapper">
-                                    <input type="number" id="grade-math20_1" min="0" max="100" value="88" oninput="syncFromInput('math20_1')">
-                                    <span class="unit">%</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Subject 3: Chemistry 20 -->
+                    <!-- Subject 3: Chemistry 20 / Chem 30-AP -->
                     <div class="subject-row" id="row-chem20">
                         <div class="subject-info">
-                            <label for="grade-chem20" class="subject-name">Chemistry 20</label>
-                            <span class="subject-meta">Science Core • Weight: 1.15x</span>
+                            <span class="subject-name">Chemistry 20</span>
+                            <span class="subject-meta">Faculty Core Prerequisite | Science Stream</span>
                         </div>
                         <div class="controls-group">
-                            <button type="button" class="toggle-btn" id="btn-chem20" onclick="toggleAP('chem20')">
+                            <button type="button" 
+                                    id="btn-chem20" 
+                                    class="toggle-btn" 
+                                    onclick="toggleAP('chem20')"
+                                    aria-pressed="false">
                                 Standard (-1)
                             </button>
                             <div class="input-controls">
-                                <input type="range" class="grade-slider" id="slider-chem20" min="0" max="100" value="84" oninput="syncFromSlider('chem20')">
+                                <input type="range" 
+                                       id="slider-chem20" 
+                                       class="grade-slider" 
+                                       min="0" 
+                                       max="100" 
+                                       value="82" 
+                                       oninput="syncFromSlider('chem20')">
                                 <div class="grade-input-wrapper">
-                                    <input type="number" id="grade-chem20" min="0" max="100" value="84" oninput="syncFromInput('chem20')">
+                                    <input type="number" 
+                                           id="grade-chem20" 
+                                           min="0" 
+                                           max="100" 
+                                           value="82" 
+                                           oninput="syncFromInput('chem20')">
                                     <span class="unit">%</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Subject 4: Physics 20 -->
+                    <!-- Subject 4: Physics 20 / Phys 30-AP -->
                     <div class="subject-row" id="row-phys20">
                         <div class="subject-info">
-                            <label for="grade-phys20" class="subject-name">Physics 20</label>
-                            <span class="subject-meta">Science Core • Weight: 1.15x</span>
+                            <span class="subject-name">Physics 20</span>
+                            <span class="subject-meta">Faculty Core Prerequisite | Science/Engineering Stream</span>
                         </div>
                         <div class="controls-group">
-                            <button type="button" class="toggle-btn" id="btn-phys20" onclick="toggleAP('phys20')">
+                            <button type="button" 
+                                    id="btn-phys20" 
+                                    class="toggle-btn" 
+                                    onclick="toggleAP('phys20')"
+                                    aria-pressed="false">
                                 Standard (-1)
                             </button>
                             <div class="input-controls">
-                                <input type="range" class="grade-slider" id="slider-phys20" min="0" max="100" value="85" oninput="syncFromSlider('phys20')">
+                                <input type="range" 
+                                       id="slider-phys20" 
+                                       class="grade-slider" 
+                                       min="0" 
+                                       max="100" 
+                                       value="84" 
+                                       oninput="syncFromSlider('phys20')">
                                 <div class="grade-input-wrapper">
-                                    <input type="number" id="grade-phys20" min="0" max="100" value="85" oninput="syncFromInput('phys20')">
+                                    <input type="number" 
+                                           id="grade-phys20" 
+                                           min="0" 
+                                           max="100" 
+                                           value="84" 
+                                           oninput="syncFromInput('phys20')">
                                     <span class="unit">%</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Subject 5: Approved 5th Subject (20-Level) -->
+                    <!-- Subject 5: Approved 5th Academic Subject (20 or 30 Level) -->
                     <div class="subject-row" id="row-subj5_20">
                         <div class="subject-info">
-                            <label for="grade-subj5_20" class="subject-name">Approved 5th Subject 20</label>
-                            <span class="subject-meta">Bio 20 / Social 20 / Language • Weight: 1.00x</span>
+                            <span class="subject-name">5th Academic Prerequisite</span>
+                            <span class="subject-meta">Approved Option (e.g., Bio 20/30, Social 20/30, Lang 20/30)</span>
                         </div>
                         <div class="controls-group">
-                            <button type="button" class="toggle-btn" id="btn-subj5_20" onclick="toggleAP('subj5_20')">
+                            <button type="button" 
+                                    id="btn-subj5_20" 
+                                    class="toggle-btn" 
+                                    onclick="toggleAP('subj5_20')"
+                                    aria-pressed="false">
                                 Standard (-1)
                             </button>
                             <div class="input-controls">
-                                <input type="range" class="grade-slider" id="slider-subj5_20" min="0" max="100" value="83" oninput="syncFromSlider('subj5_20')">
+                                <input type="range" 
+                                       id="slider-subj5_20" 
+                                       class="grade-slider" 
+                                       min="0" 
+                                       max="100" 
+                                       value="86" 
+                                       oninput="syncFromSlider('subj5_20')">
                                 <div class="grade-input-wrapper">
-                                    <input type="number" id="grade-subj5_20" min="0" max="100" value="83" oninput="syncFromInput('subj5_20')">
+                                    <input type="number" 
+                                           id="grade-subj5_20" 
+                                           min="0" 
+                                           max="100" 
+                                           value="86" 
+                                           oninput="syncFromInput('subj5_20')">
                                     <span class="unit">%</span>
                                 </div>
                             </div>
@@ -132,47 +207,52 @@
 
                 </div>
             </form>
-        </section>
+        </main>
 
-        <!-- Results Display Panel -->
-        <section class="card results-card">
+        <!-- Prediction & Analysis Results Panel -->
+        <section class="card results-card" aria-live="polite">
             <div class="results-header">
                 <div>
-                    <span class="metric-label">EARLY ADMISSION STATUS</span>
-                    <h3 class="status-title" id="statusText">Evaluating...</h3>
+                    <span class="metric-label">Early Offer Probability</span>
+                    <h3 id="statusText" class="status-title status-risk">INITIALIZING...</h3>
                 </div>
-                <div class="chance-badge status-competitive" id="chanceDisplay">0.0%</div>
+                <div id="chanceDisplay" class="chance-badge status-risk">0.0%</div>
             </div>
 
+            <!-- Detailed Metrics Dashboard -->
             <div class="metrics-grid">
                 <div class="metric-box">
-                    <span class="metric-label">Unweighted 20-Level Avg</span>
-                    <span class="metric-value" id="unweightedAvgDisplay">0.0%</span>
+                    <span class="metric-label">Unweighted Average</span>
+                    <div id="unweightedAvgDisplay" class="metric-value">0.0%</div>
                 </div>
                 <div class="metric-box">
-                    <span class="metric-label">Weighted / AP Boost Avg</span>
-                    <span class="metric-value" id="weightedAvgDisplay">0.0%</span>
+                    <span class="metric-label">Rigorous Weighted Average</span>
+                    <div id="weightedAvgDisplay" class="metric-value">0.0%</div>
                 </div>
                 <div class="metric-box">
-                    <span class="metric-label">AP Courses Completed</span>
-                    <span class="metric-value" id="apCountDisplay">0 / 5</span>
+                    <span class="metric-label">Active AP Modules</span>
+                    <div id="apCountDisplay" class="metric-value">0 / 5</div>
+                </div>
+                <div class="metric-box">
+                    <span class="metric-label">Senior (30-Level) Credits</span>
+                    <div id="seniorCreditDisplay" class="metric-value">0 Locked</div>
                 </div>
             </div>
 
-            <div class="reason-box" id="reasonDisplay">
-                Loading early admission criteria...
+            <!-- Explanatory Assessment Engine Output -->
+            <div id="reasonDisplay" class="reason-box">
+                Adjust the subject sliders and AP toggles above to evaluate your early admission probability.
             </div>
 
+            <!-- Action Tools -->
             <div class="action-footer">
                 <button type="button" class="btn-copy" onclick="copyResultsSummary()">
-                    📋 Copy Summary to Clipboard
+                    Copy Evaluation Summary
                 </button>
             </div>
         </section>
-    </main>
-</div>
+    </div>
 
-<!-- External Modular JavaScript File -->
-<script src="app.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
