@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>U of A Engineering Early Admission Calculator</title>
+  <style>
+    :root {
+      --primary: #007a33; /* U of A Green */
+      --accent: #ffdb05;  /* U of A Gold */
+      --bg: #f4f6f8;
+      --card-bg: #ffffff;
+      --text: #1f2937;
+      --text-muted: #6b7280;
+      --border: #e5e7eb;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 850px;
+      background: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .header {
+      background-color: var(--primary);
+      color: white;
+      padding: 28px;
+      text-align: center;
+      border-bottom: 4px solid var(--accent);
+    }
+
+    .header h1 { font-size: 1.6rem; font-weight: 700; }
+    .header p { font-size: 0.9rem; opacity: 0.9; margin-top: 6px; }
+
+    .content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      padding: 28px;
+    }
+
+    @media (max-width: 768px) {
+      .content { grid-template-columns: 1fr; }
+    }
+
+    .form-group { margin-bottom: 16px; }
+    label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+    
+    .input-wrapper {
+      position: relative;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+      outline: none;
+    }
+
+    input[type="number"]:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0, 122, 51, 0.15);
+    }
+
+    .badge-input {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .results-card {
+      background: #f9fafb;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .stat-box { margin-bottom: 20px; }
+    .stat-label { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em; }
+    .stat-value { font-size: 2.2rem; font-weight: 800; color: var(--primary); margin-top: 4px; }
+
+    .prob-bar-container {
+      width: 100%;
+      background: #e5e7eb;
+      height: 10px;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .prob-bar {
+      height: 100%;
+      background: var(--primary);
+      width: 0%;
+      transition: width 0.4s ease-out;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-top: 8px;
+      background: #e0f2fe;
+      color: #0369a1;
+    }
+
+    .alerts {
+      margin-top: 16px;
+      font-size: 0.85rem;
+      line-height: 1.4;
+    }
+
+    .alert-box {
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin-top: 8px;
+    }
+
+    .alert-warning { background: #fffbebfb; color: #92400e; border: 1px solid #fcd34d; }
+    .alert-success { background: #f0fdf4; color: #166534; border: 1px solid #86efac; }
+
+    .footer {
+      text-align: center;
+      padding: 16px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+      background: #fafafa;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>U of A Engineering Predictor</h1>
+    <p>Early Admission Probability Calculator (2026–2027 Cycle)</p>
+  </div>
+
+  <div class="content">
+    <!-- Input Section -->
+    <div class="inputs-section">
+      <h2 style="font-size: 1.1rem; margin-bottom: 16px;">Grade 11 (20-Level) Marks</h2>
+      
+      <div class="form-group">
+        <label for="ela">English Language Arts 20-1</label>
+        <div class="input-wrapper">
+          <input type="number" id="ela" min="0" max="100" value="80" placeholder="e.g. 80">
+          <span class="badge-input">%</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="math">Mathematics 20-1</label>
+        <div class="input-wrapper">
+          <input type="number" id="math" min="0" max="100" value="92" placeholder="e.g. 92">
+          <span class="badge-input">%</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="chem">Chemistry 20</label>
+        <div class="input-wrapper">
+          <input type="number" id="chem" min="0" max="100" value="90" placeholder="e.g. 90">
+          <span class="badge-input">%</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="phys">Physics 20</label>
+        <div class="input-wrapper">
+          <input type="number" id="phys" min="0" max="100" value="90" placeholder="e.g. 90">
+          <span class="badge-input">%</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="social">Social 20-1 (or 5th Approved Subject)</label>
+        <div class="input-wrapper">
+          <input type="number" id="social" min="0" max="100" value="95" placeholder="e.g. 95">
+          <span class="badge-input">%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Output Section -->
+    <div class="results-card">
+      <div>
+        <div class="stat-box">
+          <div class="stat-label">5-Course Aggregate Average</div>
+          <div class="stat-value" id="avg-display">0.0%</div>
+        </div>
+
+        <div class="stat-box">
+          <div class="stat-label">Estimated Early Offer Odds</div>
+          <div class="stat-value" id="prob-display" style="color: #0284c7;">0%</div>
+          <div class="prob-bar-container">
+            <div class="prob-bar" id="prob-bar"></div>
+          </div>
+        </div>
+
+        <div class="stat-box">
+          <div class="stat-label">System Action & Status</div>
+          <div class="status-badge" id="status-display">Calculating...</div>
+        </div>
+      </div>
+
+      <div class="alerts" id="alerts-container">
+        <!-- Dynamic Alerts inserted via JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Calculations based on non-linear early evaluation model, sub-score filters, and ApplyALBERTA round mechanics.
+  </div>
+</div>
+
+<script>
+  const inputs = ['ela', 'math', 'chem', 'phys', 'social'].map(id => document.getElementById(id));
+
+  // Non-linear probability interpolation based on 5-course average
+  function calculateProbability(avg) {
+    if (avg < 85.0) return Math.max(1, (avg / 85.0) * 2);
+    if (avg >= 95.0) return 99.5;
+
+    // Piecewise linear interpolation between key thresholds
+    const thresholds = [
+      { avg: 85.0, prob: 2.0 },
+      { avg: 86.0, prob: 6.0 },
+      { avg: 87.0, prob: 14.0 },
+      { avg: 88.0, prob: 28.0 },
+      { avg: 88.5, prob: 39.0 },
+      { avg: 89.0, prob: 52.0 },
+      { avg: 89.5, prob: 64.0 },
+      { avg: 90.0, prob: 74.0 },
+      { avg: 90.5, prob: 83.0 },
+      { avg: 91.0, prob: 89.0 },
+      { avg: 91.5, prob: 93.0 },
+      { avg: 92.0, prob: 96.0 },
+      { avg: 93.0, prob: 98.0 },
+      { avg: 94.0, prob: 99.0 },
+      { avg: 95.0, prob: 99.5 }
+    ];
+
+    for (let i = 0; i < thresholds.length - 1; i++) {
+      let t1 = thresholds[i];
+      let t2 = thresholds[i + 1];
+      if (avg >= t1.avg && avg <= t2.avg) {
+        let ratio = (avg - t1.avg) / (t2.avg - t1.avg);
+        return t1.prob + ratio * (t2.prob - t1.prob);
+      }
+    }
+    return 0;
+  }
+
+  function getSystemStatus(avg, prob) {
+    if (avg >= 91.5) return { text: "Round 1 Direct Offer (Oct/Nov)", color: "#007a33", bg: "#dcfce7" };
+    if (avg >= 90.0) return { text: "Round 1 / Round 2 Auto-Offer", color: "#0284c7", bg: "#e0f2fe" };
+    if (avg >= 88.5) return { text: "Round 2 Re-Evaluation (Jan)", color: "#d97706", bg: "#fef3c7" };
+    if (avg >= 87.0) return { text: "Held for Term 1 Marks (Feb)", color: "#c05621", bg: "#fffaf0" };
+    return { text: "System Hold (Awaiting Gr 12 Marks)", color: "#dc2626", bg: "#fee2e2" };
+  }
+
+  function updateCalculator() {
+    const ela = parseFloat(document.getElementById('ela').value) || 0;
+    const math = parseFloat(document.getElementById('math').value) || 0;
+    const chem = parseFloat(document.getElementById('chem').value) || 0;
+    const phys = parseFloat(document.getElementById('phys').value) || 0;
+    const social = parseFloat(document.getElementById('social').value) || 0;
+
+    const avg = (ela + math + chem + phys + social) / 5.0;
+    const rawProb = calculateProbability(avg);
+
+    // Dynamic checks
+    let warnings = [];
+    let boosts = [];
+
+    // Check for ELA drag flag
+    if (ela < 78.0 && avg >= 88.5) {
+      warnings.push(`<strong>ELA Drag Flag:</strong> ELA 20-1 below 78% may trigger an algorithm hold until Grade 12 ELA marks are uploaded.`);
+    }
+
+    // Check for Social 20-1 cushion
+    if (social >= 93.0) {
+      boosts.push(`<strong>Humanities Buffer:</strong> Your ${social}% in Social 20-1 permanently locks in 20% of your average at a top tier.`);
+    }
+
+    // Display values
+    document.getElementById('avg-display').textContent = avg.toFixed(1) + '%';
+    document.getElementById('prob-display').textContent = rawProb.toFixed(1) + '%';
+    
+    const probBar = document.getElementById('prob-bar');
+    probBar.style.width = Math.min(100, rawProb) + '%';
+
+    const status = getSystemStatus(avg, rawProb);
+    const statusBadge = document.getElementById('status-display');
+    statusBadge.textContent = status.text;
+    statusBadge.style.color = status.color;
+    statusBadge.style.backgroundColor = status.bg;
+
+    // Render Alerts
+    const alertsContainer = document.getElementById('alerts-container');
+    alertsContainer.innerHTML = '';
+
+    boosts.forEach(text => {
+      let div = document.createElement('div');
+      div.className = 'alert-box alert-success';
+      div.innerHTML = text;
+      alertsContainer.appendChild(div);
+    });
+
+    warnings.forEach(text => {
+      let div = document.createElement('div');
+      div.className = 'alert-box alert-warning';
+      div.innerHTML = text;
+      alertsContainer.appendChild(div);
+    });
+  }
+
+  inputs.forEach(input => input.addEventListener('input', updateCalculator));
+  
+  // Initial run
+  updateCalculator();
+</script>
+
+</body>
+</html>
