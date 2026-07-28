@@ -1,27 +1,62 @@
 /* ==========================================================================
-   Grade 11 Early Admission & AP Predictor Logic Engine (app.js)
+   Grade 11 Early Admission & Fast-Tracked 30-AP Engine (app.js)
    ========================================================================== */
 
-// Global AP Toggle State Tracking (false = Standard -1, true = AP)
+/**
+ * Global AP Toggle State Tracking
+ * false = Standard Course (-1), true = AP Course
+ */
 const apState = {
-    ela20: false,
-    math20_1: false,
-    chem20: false,
-    phys20: false,
-    subj5_20: false
-};
-
-// Course weights for Faculty of Engineering / Science early admission tracks
-const courseWeights = {
-    math20_1: 1.25,
-    chem20: 1.15,
-    phys20: 1.15,
-    ela20: 1.00,
-    subj5_20: 1.00
+    math30_1: false, // Math 30-1 / Math 30-AP (Fast-tracked 30-level credit)
+    ela20: false,    // ELA 20-1
+    chem20: false,   // Chemistry 20 / Chem 30-AP
+    phys20: false,   // Physics 20 / Phys 30-AP
+    subj5_20: false  // Approved 5th Subject
 };
 
 /**
- * Toggle AP course status for a subject and trigger re-calculation
+ * Metadata map detailing course level, weightings, and AP multipliers
+ */
+const courseConfig = {
+    math30_1: {
+        name: 'Math 30-1 / Math 30-AP',
+        isSenior30Level: true, // Direct Grade 12 Credit
+        weight: 1.30,          // Critical prerequisite weight for STEM/Science streams
+        apMultiplier: 1.050,   // Superior 5.0% rigor boost for completed 30-AP course
+        targetCutoffBonus: 2.0 // Reduces competitive target cutoff by 2.0%
+    },
+    ela20: {
+        name: 'ELA 20-1',
+        isSenior30Level: false,
+        weight: 1.00,
+        apMultiplier: 1.035,   // Standard 3.5% rigor boost for 20-level AP
+        targetCutoffBonus: 0.8
+    },
+    chem20: {
+        name: 'Chemistry 20',
+        isSenior30Level: false,
+        weight: 1.15,
+        apMultiplier: 1.035,
+        targetCutoffBonus: 0.8
+    },
+    phys20: {
+        name: 'Physics 20',
+        isSenior30Level: false,
+        weight: 1.15,
+        apMultiplier: 1.035,
+        targetCutoffBonus: 0.8
+    },
+    subj5_20: {
+        name: '5th Academic Prerequisite',
+        isSenior30Level: false,
+        weight: 1.00,
+        apMultiplier: 1.035,
+        targetCutoffBonus: 0.8
+    }
+};
+
+/**
+ * Toggle AP status for a subject and trigger re-calculation
  * @param {string} subjectKey 
  */
 function toggleAP(subjectKey) {
@@ -30,9 +65,11 @@ function toggleAP(subjectKey) {
     
     if (apState[subjectKey]) {
         btn.classList.add('is-ap');
+        btn.setAttribute('aria-pressed', 'true');
         btn.textContent = 'AP Course';
     } else {
         btn.classList.remove('is-ap');
+        btn.setAttribute('aria-pressed', 'false');
         btn.textContent = 'Standard (-1)';
     }
 
@@ -65,12 +102,43 @@ function syncFromInput(subjectKey) {
 }
 
 /**
- * Main calculation engine evaluating 20-level prerequisites and AP rigor
+ * Calculates AP converted mark if applicable.
+ * Canadian institutions convert official AP scores (4 or 5) into boosted percentage equivalencies.
+ * @param {number} rawMark 
+ * @param {boolean} isAP 
+ * @param {number} multiplier 
+ * @returns {number}
+ */
+function applyAPConversion(rawMark, isAP, multiplier) {
+    if (!isAP) return rawMark;
+    
+    // Calculate school percentage with AP rigor multiplier
+    let boostedMark = rawMark * multiplier;
+
+    // Simulated College Board AP Scale Overlay:
+    // High raw school marks in AP courses (>88%) typically correlate to a 5 on AP Exams (96-100% conversion)
+    // Marks between 78-87% correlate to a 4 on AP Exams (86-92% conversion)
+    let apConversionScale = rawMark;
+    if (rawMark >= 88) {
+        apConversionScale = Math.max(boostedMark, 96.0);
+    } else if (rawMark >= 78) {
+        apConversionScale = Math.max(boostedMark, 88.0);
+    } else {
+        apConversionScale = boostedMark;
+    }
+
+    // Universities take the HIGHER of the school mark vs AP conversion scale
+    return Math.min(100.0, Math.max(boostedMark, apConversionScale));
+}
+
+/**
+ * Main Calculation Engine
+ * Evaluates 30-level fast-tracked credits, 20-level prerequisites, and AP rigor
  */
 function calculateAdmissions() {
     const rawGrades = {
+        math30_1: parseFloat(document.getElementById('grade-math30_1').value) || 0,
         ela20: parseFloat(document.getElementById('grade-ela20').value) || 0,
-        math20_1: parseFloat(document.getElementById('grade-math20_1').value) || 0,
         chem20: parseFloat(document.getElementById('grade-chem20').value) || 0,
         phys20: parseFloat(document.getElementById('grade-phys20').value) || 0,
         subj5_20: parseFloat(document.getElementById('grade-subj5_20').value) || 0
@@ -78,11 +146,11 @@ function calculateAdmissions() {
 
     const subjects = Object.keys(rawGrades);
     
-    // Early Admission Threshold Rules (Strict)
-    const earlyMinSubjectThreshold = 60.0; // Minimum grade required per subject for early consideration
+    // Admission Gatekeeper Threshold Rules
+    const earlyMinSubjectThreshold = 60.0; // Minimum grade required per subject
     const minFacultyEligibilityAverage = 70.0; // Hard cutoff for faculty admission consideration
 
-    // 1. HARD KNOCKOUT EVALUATION (Gatekeeper Rules)
+    // 1. HARD KNOCKOUT EVALUATION
     for (let key of subjects) {
         if (rawGrades[key] < earlyMinSubjectThreshold) {
             renderResults({
@@ -90,9 +158,10 @@ function calculateAdmissions() {
                 unweightedAvg: calculateUnweightedAvg(rawGrades),
                 weightedAvg: 0.0,
                 apCount: countActiveAP(),
+                seniorCount: countSeniorCredits(),
                 statusClass: 'status-rejected',
                 statusText: 'REJECTED',
-                reason: `Knockout Rule: Grade in ${formatSubjectName(key)} (${rawGrades[key]}%) is below the early admission minimum prerequisite requirement of ${earlyMinSubjectThreshold}%.`
+                reason: `Knockout Rule: Grade in ${courseConfig[key].name} (${rawGrades[key]}%) is below the early admission minimum prerequisite requirement of ${earlyMinSubjectThreshold}%.`
             });
             return;
         }
@@ -106,60 +175,75 @@ function calculateAdmissions() {
             unweightedAvg: unweightedAvg,
             weightedAvg: unweightedAvg,
             apCount: countActiveAP(),
+            seniorCount: countSeniorCredits(),
             statusClass: 'status-rejected',
             statusText: 'REJECTED',
-            reason: `Overall 20-level unweighted average (${unweightedAvg.toFixed(1)}%) is below the minimum faculty eligibility threshold of 70.0%.`
+            reason: `Overall 5-subject unweighted average (${unweightedAvg.toFixed(1)}%) is below the minimum faculty eligibility threshold of 70.0%.`
         });
         return;
     }
 
-    // 2. AP EVALUATION & RIGOR WEIGHTING
+    // 2. AP EVALUATION & COURSE RIGOR WEIGHTING
     let totalWeightedScore = 0;
     let totalWeight = 0;
     let apCourseCount = 0;
+    let totalTargetCutoffBonus = 0;
 
     for (let key of subjects) {
-        let mark = rawGrades[key];
+        const config = courseConfig[key];
+        const isAP = apState[key];
         
-        // Applying 1.035x Rigor Multiplier if AP version is selected (capped at 100%)
-        if (apState[key]) {
-            mark = Math.min(100, mark * 1.035);
+        // Evaluate AP mark with dual-conversion scaling
+        const effectiveMark = applyAPConversion(rawGrades[key], isAP, config.apMultiplier);
+
+        if (isAP) {
             apCourseCount++;
+            totalTargetCutoffBonus += config.targetCutoffBonus;
         }
 
-        const weight = courseWeights[key] || 1.0;
-        totalWeightedScore += mark * weight;
-        totalWeight += weight;
+        totalWeightedScore += effectiveMark * config.weight;
+        totalWeight += config.weight;
     }
 
     const weightedAvg = totalWeightedScore / totalWeight;
 
-    // 3. SIGMOID ADMISSION PROBABILITY CURVE
-    // Historical Grade 11 Early Admission Target Cutoff: ~89.0%
-    // Each completed AP module lowers effective target competitive cutoff by 0.8%
-    const targetCutoff = 89.0 - (0.8 * apCourseCount);
-    const k = 0.38; // Curve steepness coefficient
+    // 3. MULTI-FACTOR SIGMOID ADMISSION PROBABILITY CURVE
+    // Base Competitive Early Admission Target Cutoff: ~88.5%
+    // Having completed Math 30-1 / Math 30-AP early provides an additional systemic boost (-1.5% baseline reduction)
+    let baselineTargetCutoff = 88.5;
+    
+    // Fast-tracked 30-level credit advantage
+    const completedSeniorCredits = countSeniorCredits();
+    if (completedSeniorCredits > 0) {
+        baselineTargetCutoff -= 1.5; // Locked 30-level mark reduces admission volatility
+    }
 
-    let rawProb = 1 / (1 + Math.exp(-k * (weightedAvg - targetCutoff)));
+    // Apply cumulative AP course bonuses
+    const finalTargetCutoff = baselineTargetCutoff - totalTargetCutoffBonus;
+
+    // Logistic Curve Coefficients
+    const k = 0.40; // Curve steepness coefficient
+
+    let rawProb = 1 / (1 + Math.exp(-k * (weightedAvg - finalTargetCutoff)));
     let percentage = rawProb * 100;
 
     // Boundary constraints
-    if (weightedAvg >= 94.0) percentage = Math.max(percentage, 98.5);
-    if (weightedAvg < 81.0) percentage = Math.min(percentage, 1.5);
+    if (weightedAvg >= 94.0) percentage = Math.max(percentage, 99.0);
+    if (weightedAvg < 80.0) percentage = Math.min(percentage, 1.0);
 
-    // Classification Categories
+    // Classification Categories & Explanatory Feedback
     let statusClass = 'status-risk';
     let statusText = 'HIGH RISK / WAITLIST';
-    let reason = 'Your Grade 11 average is below recent early admission pools. You will likely need to wait for 30-level final grade evaluations in spring/summer.';
+    let reason = 'Your evaluation average sits below recent early admission cutoffs. You will likely need to wait for Grade 12 second-semester transcript updates.';
 
     if (percentage >= 80) {
         statusClass = 'status-strong';
         statusText = 'STRONG CANDIDATE';
-        reason = 'Excellent profile! High probability of receiving an Early Admission conditional offer based on 20-level marks.';
+        reason = `Outstanding profile! Having a completed Grade 12 credit (${courseConfig.math30_1.name}) combined with high AP rigor gives you a top-tier probability for an early conditional offer.`;
     } else if (percentage >= 45) {
         statusClass = 'status-competitive';
         statusText = 'COMPETITIVE';
-        reason = 'Your marks place you inside the competitive pool. Conditional offers may arrive in secondary early waves as capacity allows.';
+        reason = 'Your marks place you squarely within the competitive pool. Conditional offers may arrive in secondary early waves as faculty seats open.';
     }
 
     renderResults({
@@ -167,6 +251,7 @@ function calculateAdmissions() {
         unweightedAvg: unweightedAvg,
         weightedAvg: weightedAvg,
         apCount: apCourseCount,
+        seniorCount: completedSeniorCredits,
         statusClass: statusClass,
         statusText: statusText,
         reason: reason
@@ -174,7 +259,7 @@ function calculateAdmissions() {
 }
 
 /**
- * Calculates unweighted arithmetic mean across all subjects
+ * Calculates unweighted arithmetic mean across all 5 subjects
  */
 function calculateUnweightedAvg(grades) {
     const vals = Object.values(grades);
@@ -189,17 +274,11 @@ function countActiveAP() {
 }
 
 /**
- * Helper to display human-readable subject names
+ * Counts completed Grade 12 (30-level) credits
  */
-function formatSubjectName(key) {
-    const names = {
-        ela20: 'ELA 20-1',
-        math20_1: 'Math 20-1',
-        chem20: 'Chemistry 20',
-        phys20: 'Physics 20',
-        subj5_20: 'Approved 5th Subject 20'
-    };
-    return names[key] || key;
+function countSeniorCredits() {
+    // Math 30-1 / Math 30-AP is completed in Grade 11
+    return 1;
 }
 
 /**
@@ -219,6 +298,7 @@ function renderResults(data) {
     document.getElementById('unweightedAvgDisplay').textContent = `${data.unweightedAvg.toFixed(1)}%`;
     document.getElementById('weightedAvgDisplay').textContent = `${data.weightedAvg.toFixed(1)}%`;
     document.getElementById('apCountDisplay').textContent = `${data.apCount} / 5`;
+    document.getElementById('seniorCreditDisplay').textContent = `${data.seniorCount} Locked (30-Level)`;
 
     reasonDisplay.textContent = data.reason;
     if (data.statusClass === 'status-rejected') {
@@ -237,19 +317,21 @@ function copyResultsSummary() {
     const unweighted = document.getElementById('unweightedAvgDisplay').textContent;
     const weighted = document.getElementById('weightedAvgDisplay').textContent;
     const apCount = document.getElementById('apCountDisplay').textContent;
+    const seniorCredit = document.getElementById('seniorCreditDisplay').textContent;
     const reason = document.getElementById('reasonDisplay').textContent;
 
-    const summaryText = `--- Grade 11 Early Admission Prediction ---\n` +
+    const summaryText = `--- Grade 11 Early Admission & Fast-Track 30-AP Evaluation ---\n` +
         `Status: ${status} (${chance})\n` +
-        `Unweighted 20-Level Average: ${unweighted}\n` +
-        `AP-Weighted Average: ${weighted}\n` +
-        `Active AP Courses: ${apCount}\n` +
-        `Assessment: ${reason}`;
+        `Unweighted 5-Subject Average: ${unweighted}\n` +
+        `AP-Weighted Rigor Average: ${weighted}\n` +
+        `Active AP Modules: ${apCount}\n` +
+        `Grade 12 (30-Level) Credits Completed: ${seniorCredit}\n` +
+        `Assessment Summary: ${reason}`;
 
     navigator.clipboard.writeText(summaryText).then(() => {
-        alert('Summary copied to clipboard!');
+        alert('Evaluation summary copied to clipboard!');
     }).catch(err => {
-        console.error('Failed to copy: ', err);
+        console.error('Failed to copy text: ', err);
     });
 }
 
