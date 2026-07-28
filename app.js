@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Grade 11 Early Admission & Fast-Tracked 30-AP Engine (app.js)
+   Grade 11 Early Admission & Fast-Tracked 30-AP Engine (app.js) - FIXED
    ========================================================================== */
 
 /**
@@ -20,16 +20,16 @@ const apState = {
 const courseConfig = {
     math30_1: {
         name: 'Math 30-1 / Math 30-AP',
-        isSenior30Level: true, // Direct Grade 12 Credit
-        weight: 1.30,          // Critical prerequisite weight for STEM/Science streams
-        apMultiplier: 1.050,   // Superior 5.0% rigor boost for completed 30-AP course
-        targetCutoffBonus: 2.0 // Reduces competitive target cutoff by 2.0%
+        isSenior30Level: true, 
+        weight: 1.30,          
+        apMultiplier: 1.050,   
+        targetCutoffBonus: 2.0 
     },
     ela20: {
         name: 'ELA 20-1',
         isSenior30Level: false,
         weight: 1.00,
-        apMultiplier: 1.035,   // Standard 3.5% rigor boost for 20-level AP
+        apMultiplier: 1.035,   
         targetCutoffBonus: 0.8
     },
     chem20: {
@@ -57,20 +57,21 @@ const courseConfig = {
 
 /**
  * Toggle AP status for a subject and trigger re-calculation
- * @param {string} subjectKey 
  */
 function toggleAP(subjectKey) {
     apState[subjectKey] = !apState[subjectKey];
     const btn = document.getElementById(`btn-${subjectKey}`);
     
-    if (apState[subjectKey]) {
-        btn.classList.add('is-ap');
-        btn.setAttribute('aria-pressed', 'true');
-        btn.textContent = 'AP Course';
-    } else {
-        btn.classList.remove('is-ap');
-        btn.setAttribute('aria-pressed', 'false');
-        btn.textContent = 'Standard (-1)';
+    if (btn) {
+        if (apState[subjectKey]) {
+            btn.classList.add('is-ap');
+            btn.setAttribute('aria-pressed', 'true');
+            btn.textContent = 'AP Course';
+        } else {
+            btn.classList.remove('is-ap');
+            btn.setAttribute('aria-pressed', 'false');
+            btn.textContent = 'Standard (-1)';
+        }
     }
 
     calculateAdmissions();
@@ -78,47 +79,54 @@ function toggleAP(subjectKey) {
 
 /**
  * Sync number input when slider moves
- * @param {string} subjectKey 
  */
 function syncFromSlider(subjectKey) {
-    const sliderVal = document.getElementById(`slider-${subjectKey}`).value;
-    document.getElementById(`grade-${subjectKey}`).value = sliderVal;
+    const slider = document.getElementById(`slider-${subjectKey}`);
+    const input = document.getElementById(`grade-${subjectKey}`);
+    if (slider && input) {
+        input.value = slider.value;
+    }
     calculateAdmissions();
 }
 
 /**
  * Sync slider position when number input changes
- * @param {string} subjectKey 
  */
 function syncFromInput(subjectKey) {
-    let inputVal = parseFloat(document.getElementById(`grade-${subjectKey}`).value) || 0;
+    const input = document.getElementById(`grade-${subjectKey}`);
+    const slider = document.getElementById(`slider-${subjectKey}`);
     
-    // Clamp values between 0 and 100
-    if (inputVal > 100) inputVal = 100;
-    if (inputVal < 0) inputVal = 0;
-    
-    document.getElementById(`slider-${subjectKey}`).value = inputVal;
+    if (input && slider) {
+        let inputVal = parseFloat(input.value);
+        if (isNaN(inputVal)) inputVal = 0;
+        
+        if (inputVal > 100) inputVal = 100;
+        if (inputVal < 0) inputVal = 0;
+        
+        slider.value = inputVal;
+    }
     calculateAdmissions();
 }
 
 /**
+ * Helper to safely extract number values from DOM inputs
+ */
+function getInputValue(id) {
+    const el = document.getElementById(id);
+    if (!el) return 0;
+    const val = parseFloat(el.value);
+    return isNaN(val) ? 0 : val;
+}
+
+/**
  * Calculates AP converted mark if applicable.
- * Canadian institutions convert official AP scores (4 or 5) into boosted percentage equivalencies.
- * @param {number} rawMark 
- * @param {boolean} isAP 
- * @param {number} multiplier 
- * @returns {number}
  */
 function applyAPConversion(rawMark, isAP, multiplier) {
     if (!isAP) return rawMark;
     
-    // Calculate school percentage with AP rigor multiplier
     let boostedMark = rawMark * multiplier;
-
-    // Simulated College Board AP Scale Overlay:
-    // High raw school marks in AP courses (>88%) typically correlate to a 5 on AP Exams (96-100% conversion)
-    // Marks between 78-87% correlate to a 4 on AP Exams (86-92% conversion)
     let apConversionScale = rawMark;
+
     if (rawMark >= 88) {
         apConversionScale = Math.max(boostedMark, 96.0);
     } else if (rawMark >= 78) {
@@ -127,28 +135,25 @@ function applyAPConversion(rawMark, isAP, multiplier) {
         apConversionScale = boostedMark;
     }
 
-    // Universities take the HIGHER of the school mark vs AP conversion scale
     return Math.min(100.0, Math.max(boostedMark, apConversionScale));
 }
 
 /**
  * Main Calculation Engine
- * Evaluates 30-level fast-tracked credits, 20-level prerequisites, and AP rigor
  */
 function calculateAdmissions() {
+    // Safely retrieve input values to avoid null/NaN crashes
     const rawGrades = {
-        math30_1: parseFloat(document.getElementById('grade-math30_1').value) || 0,
-        ela20: parseFloat(document.getElementById('grade-ela20').value) || 0,
-        chem20: parseFloat(document.getElementById('grade-chem20').value) || 0,
-        phys20: parseFloat(document.getElementById('grade-phys20').value) || 0,
-        subj5_20: parseFloat(document.getElementById('grade-subj5_20').value) || 0
+        math30_1: getInputValue('grade-math30_1'),
+        ela20: getInputValue('grade-ela20'),
+        chem20: getInputValue('grade-chem20'),
+        phys20: getInputValue('grade-phys20'),
+        subj5_20: getInputValue('grade-subj5_20')
     };
 
     const subjects = Object.keys(rawGrades);
-    
-    // Admission Gatekeeper Threshold Rules
-    const earlyMinSubjectThreshold = 60.0; // Minimum grade required per subject
-    const minFacultyEligibilityAverage = 70.0; // Hard cutoff for faculty admission consideration
+    const earlyMinSubjectThreshold = 60.0; 
+    const minFacultyEligibilityAverage = 70.0; 
 
     // 1. HARD KNOCKOUT EVALUATION
     for (let key of subjects) {
@@ -192,8 +197,6 @@ function calculateAdmissions() {
     for (let key of subjects) {
         const config = courseConfig[key];
         const isAP = apState[key];
-        
-        // Evaluate AP mark with dual-conversion scaling
         const effectiveMark = applyAPConversion(rawGrades[key], isAP, config.apMultiplier);
 
         if (isAP) {
@@ -208,30 +211,22 @@ function calculateAdmissions() {
     const weightedAvg = totalWeightedScore / totalWeight;
 
     // 3. MULTI-FACTOR SIGMOID ADMISSION PROBABILITY CURVE
-    // Base Competitive Early Admission Target Cutoff: ~88.5%
-    // Having completed Math 30-1 / Math 30-AP early provides an additional systemic boost (-1.5% baseline reduction)
     let baselineTargetCutoff = 88.5;
     
-    // Fast-tracked 30-level credit advantage
     const completedSeniorCredits = countSeniorCredits();
     if (completedSeniorCredits > 0) {
-        baselineTargetCutoff -= 1.5; // Locked 30-level mark reduces admission volatility
+        baselineTargetCutoff -= 1.5; 
     }
 
-    // Apply cumulative AP course bonuses
     const finalTargetCutoff = baselineTargetCutoff - totalTargetCutoffBonus;
-
-    // Logistic Curve Coefficients
-    const k = 0.40; // Curve steepness coefficient
+    const k = 0.40; 
 
     let rawProb = 1 / (1 + Math.exp(-k * (weightedAvg - finalTargetCutoff)));
     let percentage = rawProb * 100;
 
-    // Boundary constraints
     if (weightedAvg >= 94.0) percentage = Math.max(percentage, 99.0);
     if (weightedAvg < 80.0) percentage = Math.min(percentage, 1.0);
 
-    // Classification Categories & Explanatory Feedback
     let statusClass = 'status-risk';
     let statusText = 'HIGH RISK / WAITLIST';
     let reason = 'Your evaluation average sits below recent early admission cutoffs. You will likely need to wait for Grade 12 second-semester transcript updates.';
@@ -258,67 +253,64 @@ function calculateAdmissions() {
     });
 }
 
-/**
- * Calculates unweighted arithmetic mean across all 5 subjects
- */
 function calculateUnweightedAvg(grades) {
     const vals = Object.values(grades);
     return vals.reduce((a, b) => a + b, 0) / vals.length;
 }
 
-/**
- * Counts total active AP courses
- */
 function countActiveAP() {
     return Object.values(apState).filter(Boolean).length;
 }
 
-/**
- * Counts completed Grade 12 (30-level) credits
- */
 function countSeniorCredits() {
-    // Math 30-1 / Math 30-AP is completed in Grade 11
     return 1;
 }
 
-/**
- * Updates DOM components with calculated data
- */
 function renderResults(data) {
     const chanceDisplay = document.getElementById('chanceDisplay');
     const statusText = document.getElementById('statusText');
     const reasonDisplay = document.getElementById('reasonDisplay');
 
-    chanceDisplay.textContent = `${data.chance.toFixed(1)}%`;
-    chanceDisplay.className = `chance-badge ${data.statusClass}`;
+    if (chanceDisplay) {
+        chanceDisplay.textContent = `${data.chance.toFixed(1)}%`;
+        chanceDisplay.className = `chance-badge ${data.statusClass}`;
+    }
 
-    statusText.textContent = data.statusText;
-    statusText.className = `status-title ${data.statusClass}`;
+    if (statusText) {
+        statusText.textContent = data.statusText;
+        statusText.className = `status-title ${data.statusClass}`;
+    }
 
-    document.getElementById('unweightedAvgDisplay').textContent = `${data.unweightedAvg.toFixed(1)}%`;
-    document.getElementById('weightedAvgDisplay').textContent = `${data.weightedAvg.toFixed(1)}%`;
-    document.getElementById('apCountDisplay').textContent = `${data.apCount} / 5`;
-    document.getElementById('seniorCreditDisplay').textContent = `${data.seniorCount} Locked (30-Level)`;
+    const unweightedEl = document.getElementById('unweightedAvgDisplay');
+    if (unweightedEl) unweightedEl.textContent = `${data.unweightedAvg.toFixed(1)}%`;
 
-    reasonDisplay.textContent = data.reason;
-    if (data.statusClass === 'status-rejected') {
-        reasonDisplay.classList.add('is-rejected');
-    } else {
-        reasonDisplay.classList.remove('is-rejected');
+    const weightedEl = document.getElementById('weightedAvgDisplay');
+    if (weightedEl) weightedEl.textContent = `${data.weightedAvg.toFixed(1)}%`;
+
+    const apCountEl = document.getElementById('apCountDisplay');
+    if (apCountEl) apCountEl.textContent = `${data.apCount} / 5`;
+
+    const seniorCreditEl = document.getElementById('seniorCreditDisplay');
+    if (seniorCreditEl) seniorCreditEl.textContent = `${data.seniorCount} Locked (30-Level)`;
+
+    if (reasonDisplay) {
+        reasonDisplay.textContent = data.reason;
+        if (data.statusClass === 'status-rejected') {
+            reasonDisplay.classList.add('is-rejected');
+        } else {
+            reasonDisplay.classList.remove('is-rejected');
+        }
     }
 }
 
-/**
- * Copies a text summary of the student's evaluation to clipboard
- */
 function copyResultsSummary() {
-    const status = document.getElementById('statusText').textContent;
-    const chance = document.getElementById('chanceDisplay').textContent;
-    const unweighted = document.getElementById('unweightedAvgDisplay').textContent;
-    const weighted = document.getElementById('weightedAvgDisplay').textContent;
-    const apCount = document.getElementById('apCountDisplay').textContent;
-    const seniorCredit = document.getElementById('seniorCreditDisplay').textContent;
-    const reason = document.getElementById('reasonDisplay').textContent;
+    const status = document.getElementById('statusText')?.textContent || '';
+    const chance = document.getElementById('chanceDisplay')?.textContent || '';
+    const unweighted = document.getElementById('unweightedAvgDisplay')?.textContent || '';
+    const weighted = document.getElementById('weightedAvgDisplay')?.textContent || '';
+    const apCount = document.getElementById('apCountDisplay')?.textContent || '';
+    const seniorCredit = document.getElementById('seniorCreditDisplay')?.textContent || '';
+    const reason = document.getElementById('reasonDisplay')?.textContent || '';
 
     const summaryText = `--- Grade 11 Early Admission & Fast-Track 30-AP Evaluation ---\n` +
         `Status: ${status} (${chance})\n` +
@@ -335,5 +327,9 @@ function copyResultsSummary() {
     });
 }
 
-// Initial calculation on page load
-window.addEventListener('DOMContentLoaded', calculateAdmissions);
+// Guaranteed DOM Ready Initialization
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', calculateAdmissions);
+} else {
+    calculateAdmissions();
+}
