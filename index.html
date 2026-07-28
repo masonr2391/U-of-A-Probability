@@ -3,214 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Alberta University Grade 11 Early Admission Predictor & Fast-Tracked 30-AP Algorithmic Evaluator">
-    <title>Grade 11 Early Admission & 30-AP Fast-Track Predictor</title>
-    <link rel="stylesheet" href="./styles.css">
+    <title>2026-2027 Alberta Engineering Early Admission Predictor</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <!-- Header Section -->
         <header class="main-header">
-            <h1>Grade 11 Early Admission Predictor</h1>
-            <p>Calculates conditional early offer probability for Alberta universities using completed Grade 12 (30-level) fast-tracked credits, 20-level prerequisites, and AP conversion weighting.</p>
+            <h1>Alberta Engineering Early Admission Predictor</h1>
+            <p>Grade 11 Evaluation Engine | 2026–2027 Admissions Cycle</p>
         </header>
 
-        <!-- Configuration Selector Controls Card -->
-        <section class="card config-card">
-            <div class="section-title">
-                <h2>Target Institution & Program Stream</h2>
-                <span class="badge-info">Algorithmic Evaluator v2.0</span>
-            </div>
-            <p class="section-description">
-                Select your target post-secondary institution and program stream. The algorithm dynamically adjusts required subject counts (4 vs. 5 subjects), core prerequisite weights, and faculty-specific competitive cutoffs.
-            </p>
-
-            <div class="selector-grid">
-                <!-- University Target Selection -->
-                <div class="selector-group">
-                    <label for="selectUniversity" class="selector-label">Target Institution:</label>
-                    <select id="selectUniversity" class="dropdown-control">
-                        <option value="UofA" selected>University of Alberta (5-Subject Evaluation)</option>
-                        <option value="UofC">University of Calgary (4-Subject Top Average)</option>
-                    </select>
-                </div>
-
-                <!-- Faculty Stream Selection -->
-                <div class="selector-group">
-                    <label for="selectStream" class="selector-label">Faculty / Program Stream:</label>
-                    <select id="selectStream" class="dropdown-control">
-                        <option value="engineering" selected>Engineering & Applied Sciences</option>
-                        <option value="sciences">Faculty of Science (Bio, Chem, Phys, CS)</option>
-                        <option value="business">School of Business / Commerce</option>
-                        <option value="arts">Faculty of Arts & Humanities</option>
-                    </select>
-                </div>
-            </div>
-        </section>
-
-        <!-- Main Form Input Card -->
         <main class="card">
-            <div class="section-title">
-                <h2>Transcript & Course Inputs</h2>
-            </div>
-            <p class="section-description">
-                Enter your current percentages and AP toggles. 30-level courses completed early carry superior weight and override 20-level placeholders in early admission rounds with automated discrepancy safeguards.
-            </p>
+            <h2>Enter 5 Core Prerequisites</h2>
+            <p class="subtitle">Input your current Grade 11 (20-level) or fast-tracked Grade 12 percentages.</p>
 
-            <form id="admissionForm" onsubmit="event.preventDefault();">
-                <div class="subject-grid">
-                    
-                    <!-- Subject 1: Math 30-1 / Math 30-AP -->
-                    <div class="subject-row senior-credit-row" id="row-math30_1">
-                        <div class="subject-info">
-                            <div class="subject-header-tags">
-                                <span class="subject-name">Math 30-1 / Math 30-AP</span>
-                                <span class="badge-senior">Grade 12 Credit Locked</span>
-                            </div>
-                            <span class="subject-meta">Replaces Math 20-1 | Completed Senior Math Credit</span>
-                        </div>
-                        <div class="controls-group">
-                            <button type="button" id="btn-math30_1" class="toggle-btn" aria-pressed="false">
-                                Standard (-1)
-                            </button>
-                            <div class="input-controls">
-                                <input type="range" id="slider-math30_1" class="grade-slider senior-slider" min="0" max="100" value="85">
-                                <div class="grade-input-wrapper">
-                                    <input type="number" id="grade-math30_1" min="0" max="100" value="85">
-                                    <span class="unit">%</span>
-                                </div>
-                            </div>
-                        </div>
+            <form id="engineeringForm">
+                <div class="input-grid">
+                    <div class="field-group">
+                        <label for="grade-math">Mathematics (Math 20-1 / 30-1)</label>
+                        <input type="number" id="grade-math" min="0" max="100" value="88" required>
                     </div>
 
-                    <!-- Subject 2: ELA 20-1 -->
-                    <div class="subject-row" id="row-ela20">
-                        <div class="subject-info">
-                            <span class="subject-name">ELA 20-1</span>
-                            <span class="subject-meta">Core Prerequisite | Grade 11 Humanities</span>
-                        </div>
-                        <div class="controls-group">
-                            <button type="button" id="btn-ela20" class="toggle-btn" aria-pressed="false">
-                                Standard (-1)
-                            </button>
-                            <div class="input-controls">
-                                <input type="range" id="slider-ela20" class="grade-slider" min="0" max="100" value="80">
-                                <div class="grade-input-wrapper">
-                                    <input type="number" id="grade-ela20" min="0" max="100" value="80">
-                                    <span class="unit">%</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Subject 3: Chemistry 20 -->
-                    <div class="subject-row" id="row-chem20">
-                        <div class="subject-info">
-                            <span class="subject-name">Chemistry 20</span>
-                            <span class="subject-meta">Faculty Core Prerequisite | Science Stream</span>
-                        </div>
-                        <div class="controls-group">
-                            <button type="button" id="btn-chem20" class="toggle-btn" aria-pressed="false">
-                                Standard (-1)
-                            </button>
-                            <div class="input-controls">
-                                <input type="range" id="slider-chem20" class="grade-slider" min="0" max="100" value="82">
-                                <div class="grade-input-wrapper">
-                                    <input type="number" id="grade-chem20" min="0" max="100" value="82">
-                                    <span class="unit">%</span>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="field-group">
+                        <label for="grade-chem">Chemistry (Chem 20 / 30)</label>
+                        <input type="number" id="grade-chem" min="0" max="100" value="86" required>
                     </div>
 
-                    <!-- Subject 4: Physics 20 -->
-                    <div class="subject-row" id="row-phys20">
-                        <div class="subject-info">
-                            <span class="subject-name">Physics 20</span>
-                            <span class="subject-meta">Faculty Core Prerequisite | Science/Engineering Stream</span>
-                        </div>
-                        <div class="controls-group">
-                            <button type="button" id="btn-phys20" class="toggle-btn" aria-pressed="false">
-                                Standard (-1)
-                            </button>
-                            <div class="input-controls">
-                                <input type="range" id="slider-phys20" class="grade-slider" min="0" max="100" value="84">
-                                <div class="grade-input-wrapper">
-                                    <input type="number" id="grade-phys20" min="0" max="100" value="84">
-                                    <span class="unit">%</span>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="field-group">
+                        <label for="grade-phys">Physics (Phys 20 / 30)</label>
+                        <input type="number" id="grade-phys" min="0" max="100" value="87" required>
                     </div>
 
-                    <!-- Subject 5: 5th Academic -->
-                    <div class="subject-row" id="row-subj5_20">
-                        <div class="subject-info">
-                            <span class="subject-name">5th Academic Prerequisite</span>
-                            <span class="subject-meta">Approved Option (e.g., Bio 20/30, Social 20/30, Lang 20/30)</span>
-                        </div>
-                        <div class="controls-group">
-                            <button type="button" id="btn-subj5_20" class="toggle-btn" aria-pressed="false">
-                                Standard (-1)
-                            </button>
-                            <div class="input-controls">
-                                <input type="range" id="slider-subj5_20" class="grade-slider" min="0" max="100" value="86">
-                                <div class="grade-input-wrapper">
-                                    <input type="number" id="grade-subj5_20" min="0" max="100" value="86">
-                                    <span class="unit">%</span>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="field-group">
+                        <label for="grade-ela">English (ELA 20-1 / 30-1)</label>
+                        <input type="number" id="grade-ela" min="0" max="100" value="82" required>
                     </div>
 
+                    <div class="field-group">
+                        <label for="grade-option">5th Academic (Math 31 / Bio / Social)</label>
+                        <input type="number" id="grade-option" min="0" max="100" value="85" required>
+                    </div>
                 </div>
             </form>
         </main>
 
-        <!-- Dynamic Prediction & Analysis Results Panel -->
-        <section class="card results-card" aria-live="polite">
+        <section class="card results-card">
             <div class="results-header">
                 <div>
-                    <span class="metric-label">Early Offer Probability</span>
-                    <h3 id="statusText" class="status-title status-risk">INITIALIZING...</h3>
+                    <span class="label">2026–2027 Early Offer Probability</span>
+                    <h3 id="statusText">Evaluating...</h3>
                 </div>
-                <div id="chanceDisplay" class="chance-badge status-risk">0.0%</div>
+                <div id="chanceBadge" class="badge">0.0%</div>
             </div>
 
-            <div class="metrics-grid">
+            <div class="metrics">
                 <div class="metric-box">
-                    <span class="metric-label">Unweighted Average</span>
-                    <div id="unweightedAvgDisplay" class="metric-value">0.0%</div>
+                    <span>5-Subject Admission Average</span>
+                    <strong id="avgDisplay">0.0%</strong>
                 </div>
                 <div class="metric-box">
-                    <span class="metric-label">Stream-Weighted Average</span>
-                    <div id="weightedAvgDisplay" class="metric-value">0.0%</div>
-                </div>
-                <div class="metric-box">
-                    <span class="metric-label">Active AP Modules</span>
-                    <div id="apCountDisplay" class="metric-value">0 / 5</div>
-                </div>
-                <div class="metric-box">
-                    <span class="metric-label">Senior (30-Level) Credits</span>
-                    <div id="seniorCreditDisplay" class="metric-value">0 Locked</div>
+                    <span>Target Competitive Cutoff</span>
+                    <strong>88.0%</strong>
                 </div>
             </div>
 
-            <!-- Primary Assessment Summary Output -->
-            <div id="reasonDisplay" class="reason-box">
-                Adjust the subject sliders, AP toggles, target university, and program stream above to evaluate your early admission probability.
-            </div>
-
-            <!-- Dynamic Prerequisite Warnings & Risk Factors Container -->
-            <div id="warningsBox" class="warnings-box" style="display: none;"></div>
-
-            <div class="action-footer">
-                <button type="button" id="btnCopySummary" class="btn-copy">
-                    Copy Detailed Evaluation Summary
-                </button>
-            </div>
+            <div id="explanation" class="explanation-box"></div>
         </section>
     </div>
 
-    <script src="./app.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
