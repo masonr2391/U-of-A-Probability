@@ -1,355 +1,603 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>U of A Engineering Early Admission Calculator</title>
-  <style>
-    :root {
-      --primary: #007a33; /* U of A Green */
-      --accent: #ffdb05;  /* U of A Gold */
-      --bg: #f4f6f8;
-      --card-bg: #ffffff;
-      --text: #1f2937;
-      --text-muted: #6b7280;
-      --border: #e5e7eb;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart University Admission & Grade Predictor</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --border-color: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-color: #38bdf8;
+            --accent-hover: #0284c7;
+            --success-color: #22c55e;
+            --warning-color: #eab308;
+            --danger-color: #ef4444;
+            --ap-color: #a855f7;
+        }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
 
-    body {
-      background-color: var(--bg);
-      color: var(--text);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 20px;
-    }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            padding: 2rem 1rem;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
 
-    .container {
-      width: 100%;
-      max-width: 850px;
-      background: var(--card-bg);
-      border-radius: 16px;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
-      overflow: hidden;
-      border: 1px solid var(--border);
-    }
+        .container {
+            width: 100%;
+            max-width: 850px;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
 
-    .header {
-      background-color: var(--primary);
-      color: white;
-      padding: 28px;
-      text-align: center;
-      border-bottom: 4px solid var(--accent);
-    }
+        header {
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
 
-    .header h1 { font-size: 1.6rem; font-weight: 700; }
-    .header p { font-size: 0.9rem; opacity: 0.9; margin-top: 6px; }
+        header h1 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
 
-    .content {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-      padding: 28px;
-    }
+        header p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
 
-    @media (max-width: 768px) {
-      .content { grid-template-columns: 1fr; }
-    }
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
 
-    .form-group { margin-bottom: 16px; }
-    label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text); margin-bottom: 6px; }
-    
-    .input-wrapper {
-      position: relative;
-    }
+        .early-admission-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: rgba(56, 189, 248, 0.05);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1rem;
+        }
 
-    input[type="number"] {
-      width: 100%;
-      padding: 10px 14px;
-      border: 1.5px solid var(--border);
-      border-radius: 8px;
-      font-size: 1rem;
-      transition: all 0.2s ease;
-      outline: none;
-    }
+        .early-admission-bar label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
 
-    input[type="number"]:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(0, 122, 51, 0.15);
-    }
+        .early-admission-bar input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent-color);
+            cursor: pointer;
+        }
 
-    .badge-input {
-      position: absolute;
-      right: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 0.85rem;
-      color: var(--text-muted);
-    }
+        .subject-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
 
-    .results-card {
-      background: #f9fafb;
-      border: 1.5px solid var(--border);
-      border-radius: 12px;
-      padding: 24px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
+        .subject-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: rgba(15, 23, 42, 0.5);
+            border: 1px solid var(--border-color);
+            padding: 0.85rem 1rem;
+            border-radius: 8px;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
 
-    .stat-box { margin-bottom: 20px; }
-    .stat-label { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em; }
-    .stat-value { font-size: 2.2rem; font-weight: 800; color: var(--primary); margin-top: 4px; }
+        .subject-info {
+            flex: 1;
+            min-width: 160px;
+        }
 
-    .prob-bar-container {
-      width: 100%;
-      background: #e5e7eb;
-      height: 10px;
-      border-radius: 5px;
-      overflow: hidden;
-      margin-top: 8px;
-    }
+        .subject-name {
+            font-weight: 600;
+            font-size: 1rem;
+        }
 
-    .prob-bar {
-      height: 100%;
-      background: var(--primary);
-      width: 0%;
-      transition: width 0.4s ease-out;
-    }
+        .subject-sub {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
 
-    .status-badge {
-      display: inline-block;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      margin-top: 8px;
-      background: #e0f2fe;
-      color: #0369a1;
-    }
+        .controls-group {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
 
-    .alerts {
-      margin-top: 16px;
-      font-size: 0.85rem;
-      line-height: 1.4;
-    }
+        /* AP / Standard Toggle Switch */
+        .toggle-btn {
+            background-color: var(--border-color);
+            color: var(--text-secondary);
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 110px;
+            text-align: center;
+        }
 
-    .alert-box {
-      padding: 10px 14px;
-      border-radius: 8px;
-      margin-top: 8px;
-    }
+        .toggle-btn.is-ap {
+            background-color: var(--ap-color);
+            color: #ffffff;
+            box-shadow: 0 0 10px rgba(168, 85, 247, 0.4);
+        }
 
-    .alert-warning { background: #fffbebfb; color: #92400e; border: 1px solid #fcd34d; }
-    .alert-success { background: #f0fdf4; color: #166534; border: 1px solid #86efac; }
+        .grade-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
 
-    .footer {
-      text-align: center;
-      padding: 16px;
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      border-top: 1px solid var(--border);
-      background: #fafafa;
-    }
-  </style>
+        .grade-input-wrapper input {
+            width: 70px;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.4rem 0.6rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            text-align: right;
+            font-weight: 600;
+        }
+
+        .grade-input-wrapper input:focus {
+            outline: 2px solid var(--accent-color);
+            border-color: transparent;
+        }
+
+        .unit {
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .btn-submit {
+            width: 100%;
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            font-weight: 700;
+            font-size: 1rem;
+            padding: 0.85rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 1.25rem;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn-submit:hover {
+            background-color: var(--accent-hover);
+        }
+
+        /* Results Display */
+        .results-card {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .results-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .chance-badge {
+            font-size: 2.25rem;
+            font-weight: 800;
+            padding: 0.25rem 1rem;
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .status-strong { color: var(--success-color); }
+        .status-competitive { color: var(--accent-color); }
+        .status-risk { color: var(--warning-color); }
+        .status-rejected { color: var(--danger-color); }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .metric-box {
+            background-color: rgba(15, 23, 42, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+        }
+
+        .metric-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .reason-box {
+            background-color: rgba(15, 23, 42, 0.6);
+            border-left: 4px solid var(--accent-color);
+            padding: 0.85rem 1rem;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            color: var(--text-primary);
+        }
+
+        .reason-box.is-rejected {
+            border-left-color: var(--danger-color);
+        }
+
+        @media (max-width: 600px) {
+            .subject-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .controls-group {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+    </style>
 </head>
 <body>
 
 <div class="container">
-  <div class="header">
-    <h1>U of A Engineering Predictor</h1>
-    <p>Early Admission Probability Calculator (2026–2027 Cycle)</p>
-  </div>
+    <header>
+        <h1>UAlberta Admissions Predictor</h1>
+        <p>Real-time admission probability algorithm with AP rigor evaluation</p>
+    </header>
 
-  <div class="content">
-    <!-- Input Section -->
-    <div class="inputs-section">
-      <h2 style="font-size: 1.1rem; margin-bottom: 16px;">Grade 11 (20-Level) Marks</h2>
-      
-      <div class="form-group">
-        <label for="ela">English Language Arts 20-1</label>
-        <div class="input-wrapper">
-          <input type="number" id="ela" min="0" max="100" value="80" placeholder="e.g. 80">
-          <span class="badge-input">%</span>
+    <div class="card">
+        <div class="early-admission-bar">
+            <label for="earlyAdmissionToggle">
+                <input type="checkbox" id="earlyAdmissionToggle" onchange="calculateAdmissions()">
+                Evaluating with Grade 11 Prerequisites (Early Admission Wave)
+            </label>
         </div>
-      </div>
 
-      <div class="form-group">
-        <label for="math">Mathematics 20-1</label>
-        <div class="input-wrapper">
-          <input type="number" id="math" min="0" max="100" value="92" placeholder="e.g. 92">
-          <span class="badge-input">%</span>
-        </div>
-      </div>
+        <div class="subject-grid">
+            <!-- Subject 1: ELA -->
+            <div class="subject-row">
+                <div class="subject-info">
+                    <div class="subject-name">ELA 30-1</div>
+                    <div class="subject-sub">Weight: 1.00x</div>
+                </div>
+                <div class="controls-group">
+                    <button type="button" class="toggle-btn" id="btn-ela" onclick="toggleAP('ela')">Standard (-1)</button>
+                    <div class="grade-input-wrapper">
+                        <input type="number" id="grade-ela" value="82" min="0" max="100" oninput="calculateAdmissions()">
+                        <span class="unit">%</span>
+                    </div>
+                </div>
+            </div>
 
-      <div class="form-group">
-        <label for="chem">Chemistry 20</label>
-        <div class="input-wrapper">
-          <input type="number" id="chem" min="0" max="100" value="90" placeholder="e.g. 90">
-          <span class="badge-input">%</span>
-        </div>
-      </div>
+            <!-- Subject 2: Math 30-1 -->
+            <div class="subject-row">
+                <div class="subject-info">
+                    <div class="subject-name">Math 30-1</div>
+                    <div class="subject-sub">STEM Weight: 1.25x</div>
+                </div>
+                <div class="controls-group">
+                    <button type="button" class="toggle-btn" id="btn-math30_1" onclick="toggleAP('math30_1')">Standard (-1)</button>
+                    <div class="grade-input-wrapper">
+                        <input type="number" id="grade-math30_1" value="88" min="0" max="100" oninput="calculateAdmissions()">
+                        <span class="unit">%</span>
+                    </div>
+                </div>
+            </div>
 
-      <div class="form-group">
-        <label for="phys">Physics 20</label>
-        <div class="input-wrapper">
-          <input type="number" id="phys" min="0" max="100" value="90" placeholder="e.g. 90">
-          <span class="badge-input">%</span>
-        </div>
-      </div>
+            <!-- Subject 3: Math 31 -->
+            <div class="subject-row">
+                <div class="subject-info">
+                    <div class="subject-name">Math 31 / Calculus</div>
+                    <div class="subject-sub">STEM Weight: 1.25x</div>
+                </div>
+                <div class="controls-group">
+                    <button type="button" class="toggle-btn" id="btn-math31" onclick="toggleAP('math31')">Standard (-1)</button>
+                    <div class="grade-input-wrapper">
+                        <input type="number" id="grade-math31" value="86" min="0" max="100" oninput="calculateAdmissions()">
+                        <span class="unit">%</span>
+                    </div>
+                </div>
+            </div>
 
-      <div class="form-group">
-        <label for="social">Social 20-1 (or 5th Approved Subject)</label>
-        <div class="input-wrapper">
-          <input type="number" id="social" min="0" max="100" value="95" placeholder="e.g. 95">
-          <span class="badge-input">%</span>
+            <!-- Subject 4: Chemistry 30 -->
+            <div class="subject-row">
+                <div class="subject-info">
+                    <div class="subject-name">Chemistry 30</div>
+                    <div class="subject-sub">Science Weight: 1.10x</div>
+                </div>
+                <div class="controls-group">
+                    <button type="button" class="toggle-btn" id="btn-chem" onclick="toggleAP('chem')">Standard (-1)</button>
+                    <div class="grade-input-wrapper">
+                        <input type="number" id="grade-chem" value="84" min="0" max="100" oninput="calculateAdmissions()">
+                        <span class="unit">%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Subject 5: Physics 30 -->
+            <div class="subject-row">
+                <div class="subject-info">
+                    <div class="subject-name">Physics 30</div>
+                    <div class="subject-sub">Science Weight: 1.10x</div>
+                </div>
+                <div class="controls-group">
+                    <button type="button" class="toggle-btn" id="btn-phys" onclick="toggleAP('phys')">Standard (-1)</button>
+                    <div class="grade-input-wrapper">
+                        <input type="number" id="grade-phys" value="85" min="0" max="100" oninput="calculateAdmissions()">
+                        <span class="unit">%</span>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
 
-    <!-- Output Section -->
-    <div class="results-card">
-      <div>
-        <div class="stat-box">
-          <div class="stat-label">5-Course Aggregate Average</div>
-          <div class="stat-value" id="avg-display">0.0%</div>
+    <!-- Results Display -->
+    <div class="card results-card">
+        <div class="results-header">
+            <div>
+                <div class="metric-label">ESTIMATED ADMISSION CHANCE</div>
+                <div class="metric-value" id="statusText">Evaluating...</div>
+            </div>
+            <div class="chance-badge status-competitive" id="chanceDisplay">0.0%</div>
         </div>
 
-        <div class="stat-box">
-          <div class="stat-label">Estimated Early Offer Odds</div>
-          <div class="stat-value" id="prob-display" style="color: #0284c7;">0%</div>
-          <div class="prob-bar-container">
-            <div class="prob-bar" id="prob-bar"></div>
-          </div>
+        <div class="metrics-grid">
+            <div class="metric-box">
+                <div class="metric-label">Unweighted Average</div>
+                <div class="metric-value" id="unweightedAvgDisplay">0.0%</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-label">Weighted / AP Boost Average</div>
+                <div class="metric-value" id="weightedAvgDisplay">0.0%</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-label">Active AP Courses</div>
+                <div class="metric-value" id="apCountDisplay">0 / 5</div>
+            </div>
         </div>
 
-        <div class="stat-box">
-          <div class="stat-label">System Action & Status</div>
-          <div class="status-badge" id="status-display">Calculating...</div>
+        <div class="reason-box" id="reasonDisplay">
+            Enter your grades above to calculate live admission chances.
         </div>
-      </div>
-
-      <div class="alerts" id="alerts-container">
-        <!-- Dynamic Alerts inserted via JavaScript -->
-      </div>
     </div>
-  </div>
-
-  <div class="footer">
-    Calculations based on non-linear early evaluation model, sub-score filters, and ApplyALBERTA round mechanics.
-  </div>
 </div>
-
 <script>
-  const inputs = ['ela', 'math', 'chem', 'phys', 'social'].map(id => document.getElementById(id));
+    // State tracking for AP toggles (false = Standard -1, true = AP)
+    const apState = {
+        ela: false,
+        math30_1: false,
+        math31: false,
+        chem: false,
+        phys: false
+    };
 
-  // Non-linear probability interpolation based on 5-course average
-  function calculateProbability(avg) {
-    if (avg < 85.0) return Math.max(1, (avg / 85.0) * 2);
-    if (avg >= 95.0) return 99.5;
+    // Toggle AP status and update button UI
+    function toggleAP(subjectKey) {
+        apState[subjectKey] = !apState[subjectKey];
+        const btn = document.getElementById(`btn-${subjectKey}`);
+        
+        if (apState[subjectKey]) {
+            btn.classList.add('is-ap');
+            btn.textContent = 'AP Course';
+        } else {
+            btn.classList.remove('is-ap');
+            btn.textContent = 'Standard (-1)';
+        }
 
-    // Piecewise linear interpolation between key thresholds
-    const thresholds = [
-      { avg: 85.0, prob: 2.0 },
-      { avg: 86.0, prob: 6.0 },
-      { avg: 87.0, prob: 14.0 },
-      { avg: 88.0, prob: 28.0 },
-      { avg: 88.5, prob: 39.0 },
-      { avg: 89.0, prob: 52.0 },
-      { avg: 89.5, prob: 64.0 },
-      { avg: 90.0, prob: 74.0 },
-      { avg: 90.5, prob: 83.0 },
-      { avg: 91.0, prob: 89.0 },
-      { avg: 91.5, prob: 93.0 },
-      { avg: 92.0, prob: 96.0 },
-      { avg: 93.0, prob: 98.0 },
-      { avg: 94.0, prob: 99.0 },
-      { avg: 95.0, prob: 99.5 }
-    ];
-
-    for (let i = 0; i < thresholds.length - 1; i++) {
-      let t1 = thresholds[i];
-      let t2 = thresholds[i + 1];
-      if (avg >= t1.avg && avg <= t2.avg) {
-        let ratio = (avg - t1.avg) / (t2.avg - t1.avg);
-        return t1.prob + ratio * (t2.prob - t1.prob);
-      }
-    }
-    return 0;
-  }
-
-  function getSystemStatus(avg, prob) {
-    if (avg >= 91.5) return { text: "Round 1 Direct Offer (Oct/Nov)", color: "#007a33", bg: "#dcfce7" };
-    if (avg >= 90.0) return { text: "Round 1 / Round 2 Auto-Offer", color: "#0284c7", bg: "#e0f2fe" };
-    if (avg >= 88.5) return { text: "Round 2 Re-Evaluation (Jan)", color: "#d97706", bg: "#fef3c7" };
-    if (avg >= 87.0) return { text: "Held for Term 1 Marks (Feb)", color: "#c05621", bg: "#fffaf0" };
-    return { text: "System Hold (Awaiting Gr 12 Marks)", color: "#dc2626", bg: "#fee2e2" };
-  }
-
-  function updateCalculator() {
-    const ela = parseFloat(document.getElementById('ela').value) || 0;
-    const math = parseFloat(document.getElementById('math').value) || 0;
-    const chem = parseFloat(document.getElementById('chem').value) || 0;
-    const phys = parseFloat(document.getElementById('phys').value) || 0;
-    const social = parseFloat(document.getElementById('social').value) || 0;
-
-    const avg = (ela + math + chem + phys + social) / 5.0;
-    const rawProb = calculateProbability(avg);
-
-    // Dynamic checks
-    let warnings = [];
-    let boosts = [];
-
-    // Check for ELA drag flag
-    if (ela < 78.0 && avg >= 88.5) {
-      warnings.push(`<strong>ELA Drag Flag:</strong> ELA 20-1 below 78% may trigger an algorithm hold until Grade 12 ELA marks are uploaded.`);
+        calculateAdmissions();
     }
 
-    // Check for Social 20-1 cushion
-    if (social >= 93.0) {
-      boosts.push(`<strong>Humanities Buffer:</strong> Your ${social}% in Social 20-1 permanently locks in 20% of your average at a top tier.`);
+    // Core Smart Admission Prediction Logic
+    function calculateAdmissions() {
+        const isEarly = document.getElementById('earlyAdmissionToggle').checked;
+
+        // Retrieve raw numerical input values
+        const rawGrades = {
+            ela: parseFloat(document.getElementById('grade-ela').value) || 0,
+            math30_1: parseFloat(document.getElementById('grade-math30_1').value) || 0,
+            math31: parseFloat(document.getElementById('grade-math31').value) || 0,
+            chem: parseFloat(document.getElementById('grade-chem').value) || 0,
+            phys: parseFloat(document.getElementById('grade-phys').value) || 0
+        };
+
+        const subjects = Object.keys(rawGrades);
+        const minSubjectThreshold = isEarly ? 60.0 : 50.0;
+        const minFacultyAverage = 70.0;
+
+        // 1. HARD KNOCKOUT EVALUATION (Gatekeeping Rules)
+        for (let key of subjects) {
+            if (rawGrades[key] < minSubjectThreshold) {
+                renderResults({
+                    chance: 0.0,
+                    unweightedAvg: calculateUnweightedAvg(rawGrades),
+                    weightedAvg: 0.0,
+                    apCount: countActiveAP(),
+                    statusClass: 'status-rejected',
+                    statusText: 'REJECTED',
+                    reason: `Knockout Rule Triggered: Grade in ${formatSubjectName(key)} (${rawGrades[key]}%) is below the minimum required threshold of ${minSubjectThreshold}%.`
+                });
+                return;
+            }
+        }
+
+        const unweightedAvg = calculateUnweightedAvg(rawGrades);
+
+        if (unweightedAvg < minFacultyAverage) {
+            renderResults({
+                chance: 0.0,
+                unweightedAvg: unweightedAvg,
+                weightedAvg: unweightedAvg,
+                apCount: countActiveAP(),
+                statusClass: 'status-rejected',
+                statusText: 'REJECTED',
+                reason: `Overall unweighted average (${unweightedAvg.toFixed(1)}%) is below the minimum faculty eligibility threshold of 70.0%.`
+            });
+            return;
+        }
+
+        // 2. AP EVALUATION & STEM WEIGHTING
+        // Subject weights (Engineering priorities)
+        const subjectWeights = {
+            math30_1: 1.25,
+            math31: 1.25,
+            chem: 1.10,
+            phys: 1.10,
+            ela: 1.00
+        };
+
+        let totalWeightedScore = 0;
+        let totalWeight = 0;
+        let apCourseCount = 0;
+
+        for (let key of subjects) {
+            let mark = rawGrades[key];
+            
+            // Apply 1.035x AP Rigor boost if toggled ON (capped at 100%)
+            if (apState[key]) {
+                mark = Math.min(100, mark * 1.035);
+                apCourseCount++;
+            }
+
+            totalWeightedScore += mark * subjectWeights[key];
+            totalWeight += subjectWeights[key];
+        }
+
+        const weightedAvg = totalWeightedScore / totalWeight;
+
+        // 3. LOGISTIC SIGMOID PROBABILITY CURVE
+        // Base historical competitive cutoff: 88.5%
+        // Target cutoff drops by 0.8% per AP course completed
+        let targetCutoff = 88.5 - (0.8 * apCourseCount);
+        if (isEarly) targetCutoff += 1.5; // Early wave standards are slightly higher
+
+        const k = 0.38; // Curve steepness coefficient
+        let rawProb = 1 / (1 + Math.exp(-k * (weightedAvg - targetCutoff)));
+        let percentage = rawProb * 100;
+
+        // Realistic upper/lower bounds
+        if (weightedAvg >= 93.5) percentage = Math.max(percentage, 98.5);
+        if (weightedAvg < 80.0) percentage = Math.min(percentage, 1.5);
+
+        // Map status categories
+        let statusClass = 'status-risk';
+        let statusText = 'HIGH RISK';
+        let reason = 'Your average is below recent historical competitive ranges. You may be waitlisted or deferred.';
+
+        if (percentage >= 80) {
+            statusClass = 'status-strong';
+            statusText = 'STRONG CANDIDATE';
+            reason = isEarly 
+                ? 'High probability of receiving an Early Admission offer based on Grade 11 marks.' 
+                : 'Very strong candidate for a final admission offer in main selection waves.';
+        } else if (percentage >= 45) {
+            statusClass = 'status-competitive';
+            statusText = 'COMPETITIVE';
+            reason = 'You fall within the competitive pool range. Admission is likely in mid-to-late evaluation waves.';
+        }
+
+        renderResults({
+            chance: percentage,
+            unweightedAvg: unweightedAvg,
+            weightedAvg: weightedAvg,
+            apCount: apCourseCount,
+            statusClass: statusClass,
+            statusText: statusText,
+            reason: reason
+        });
     }
 
-    // Display values
-    document.getElementById('avg-display').textContent = avg.toFixed(1) + '%';
-    document.getElementById('prob-display').textContent = rawProb.toFixed(1) + '%';
-    
-    const probBar = document.getElementById('prob-bar');
-    probBar.style.width = Math.min(100, rawProb) + '%';
+    // Helper functions
+    function calculateUnweightedAvg(grades) {
+        const vals = Object.values(grades);
+        return vals.reduce((a, b) => a + b, 0) / vals.length;
+    }
 
-    const status = getSystemStatus(avg, rawProb);
-    const statusBadge = document.getElementById('status-display');
-    statusBadge.textContent = status.text;
-    statusBadge.style.color = status.color;
-    statusBadge.style.backgroundColor = status.bg;
+    function countActiveAP() {
+        return Object.values(apState).filter(Boolean).length;
+    }
 
-    // Render Alerts
-    const alertsContainer = document.getElementById('alerts-container');
-    alertsContainer.innerHTML = '';
+    function formatSubjectName(key) {
+        const names = {
+            ela: 'ELA 30-1',
+            math30_1: 'Math 30-1',
+            math31: 'Math 31',
+            chem: 'Chemistry 30',
+            phys: 'Physics 30'
+        };
+        return names[key] || key;
+    }
 
-    boosts.forEach(text => {
-      let div = document.createElement('div');
-      div.className = 'alert-box alert-success';
-      div.innerHTML = text;
-      alertsContainer.appendChild(div);
-    });
+    // Render outputs to UI DOM elements
+    function renderResults(data) {
+        const chanceDisplay = document.getElementById('chanceDisplay');
+        const statusText = document.getElementById('statusText');
+        const reasonDisplay = document.getElementById('reasonDisplay');
 
-    warnings.forEach(text => {
-      let div = document.createElement('div');
-      div.className = 'alert-box alert-warning';
-      div.innerHTML = text;
-      alertsContainer.appendChild(div);
-    });
-  }
+        chanceDisplay.textContent = `${data.chance.toFixed(1)}%`;
+        chanceDisplay.className = `chance-badge ${data.statusClass}`;
 
-  inputs.forEach(input => input.addEventListener('input', updateCalculator));
-  
-  // Initial run
-  updateCalculator();
+        statusText.textContent = data.statusText;
+        statusText.className = `metric-value ${data.statusClass}`;
+
+        document.getElementById('unweightedAvgDisplay').textContent = `${data.unweightedAvg.toFixed(1)}%`;
+        document.getElementById('weightedAvgDisplay').textContent = `${data.weightedAvg.toFixed(1)}%`;
+        document.getElementById('apCountDisplay').textContent = `${data.apCount} / 5`;
+
+        reasonDisplay.textContent = data.reason;
+        if (data.statusClass === 'status-rejected') {
+            reasonDisplay.classList.add('is-rejected');
+        } else {
+            reasonDisplay.classList.remove('is-rejected');
+        }
+    }
+
+    // Initialize default calculation on page load
+    window.addEventListener('DOMContentLoaded', calculateAdmissions);
 </script>
-
 </body>
 </html>
