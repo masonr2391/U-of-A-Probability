@@ -3,601 +3,176 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart University Admission & Grade Predictor</title>
-    <style>
-        :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --border-color: #334155;
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --accent-color: #38bdf8;
-            --accent-hover: #0284c7;
-            --success-color: #22c55e;
-            --warning-color: #eab308;
-            --danger-color: #ef4444;
-            --ap-color: #a855f7;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-primary);
-            padding: 2rem 1rem;
-            display: flex;
-            justify-content: center;
-            min-height: 100vh;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 850px;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 0.5rem;
-        }
-
-        header h1 {
-            font-size: 1.875rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 0.5rem;
-        }
-
-        header p {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-        }
-
-        .card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
-        }
-
-        .early-admission-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background-color: rgba(56, 189, 248, 0.05);
-            border: 1px solid rgba(56, 189, 248, 0.2);
-            border-radius: 8px;
-            padding: 0.75rem 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .early-admission-bar label {
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .early-admission-bar input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            accent-color: var(--accent-color);
-            cursor: pointer;
-        }
-
-        .subject-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .subject-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background-color: rgba(15, 23, 42, 0.5);
-            border: 1px solid var(--border-color);
-            padding: 0.85rem 1rem;
-            border-radius: 8px;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .subject-info {
-            flex: 1;
-            min-width: 160px;
-        }
-
-        .subject-name {
-            font-weight: 600;
-            font-size: 1rem;
-        }
-
-        .subject-sub {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-        }
-
-        .controls-group {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        /* AP / Standard Toggle Switch */
-        .toggle-btn {
-            background-color: var(--border-color);
-            color: var(--text-secondary);
-            border: none;
-            padding: 0.4rem 0.8rem;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            min-width: 110px;
-            text-align: center;
-        }
-
-        .toggle-btn.is-ap {
-            background-color: var(--ap-color);
-            color: #ffffff;
-            box-shadow: 0 0 10px rgba(168, 85, 247, 0.4);
-        }
-
-        .grade-input-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-
-        .grade-input-wrapper input {
-            width: 70px;
-            background-color: var(--bg-color);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            padding: 0.4rem 0.6rem;
-            border-radius: 6px;
-            font-size: 1rem;
-            text-align: right;
-            font-weight: 600;
-        }
-
-        .grade-input-wrapper input:focus {
-            outline: 2px solid var(--accent-color);
-            border-color: transparent;
-        }
-
-        .unit {
-            color: var(--text-secondary);
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        .btn-submit {
-            width: 100%;
-            background-color: var(--accent-color);
-            color: var(--bg-color);
-            font-weight: 700;
-            font-size: 1rem;
-            padding: 0.85rem;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-top: 1.25rem;
-            transition: background-color 0.2s ease;
-        }
-
-        .btn-submit:hover {
-            background-color: var(--accent-hover);
-        }
-
-        /* Results Display */
-        .results-card {
-            display: flex;
-            flex-direction: column;
-            gap: 1.25rem;
-        }
-
-        .results-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 1rem;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .chance-badge {
-            font-size: 2.25rem;
-            font-weight: 800;
-            padding: 0.25rem 1rem;
-            border-radius: 8px;
-            background-color: rgba(255, 255, 255, 0.05);
-        }
-
-        .status-strong { color: var(--success-color); }
-        .status-competitive { color: var(--accent-color); }
-        .status-risk { color: var(--warning-color); }
-        .status-rejected { color: var(--danger-color); }
-
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-        }
-
-        .metric-box {
-            background-color: rgba(15, 23, 42, 0.4);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 1rem;
-        }
-
-        .metric-label {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            margin-bottom: 0.25rem;
-        }
-
-        .metric-value {
-            font-size: 1.25rem;
-            font-weight: 700;
-        }
-
-        .reason-box {
-            background-color: rgba(15, 23, 42, 0.6);
-            border-left: 4px solid var(--accent-color);
-            padding: 0.85rem 1rem;
-            border-radius: 0 8px 8px 0;
-            font-size: 0.9rem;
-            line-height: 1.4;
-            color: var(--text-primary);
-        }
-
-        .reason-box.is-rejected {
-            border-left-color: var(--danger-color);
-        }
-
-        @media (max-width: 600px) {
-            .subject-row {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .controls-group {
-                width: 100%;
-                justify-content: space-between;
-            }
-        }
-    </style>
+    <title>Grade 11 Early Admission & AP Predictor</title>
+    <!-- External Modular CSS File -->
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
 <div class="container">
-    <header>
-        <h1>UAlberta Admissions Predictor</h1>
-        <p>Real-time admission probability algorithm with AP rigor evaluation</p>
+    <header class="main-header">
+        <h1>Grade 11 Early Admission Predictor</h1>
+        <p>Evaluate your early university admission chances using 20-level course marks and AP rigor weightings.</p>
     </header>
 
-    <div class="card">
-        <div class="early-admission-bar">
-            <label for="earlyAdmissionToggle">
-                <input type="checkbox" id="earlyAdmissionToggle" onchange="calculateAdmissions()">
-                Evaluating with Grade 11 Prerequisites (Early Admission Wave)
-            </label>
-        </div>
+    <main class="calculator-layout">
+        <!-- Input Panel -->
+        <section class="card input-card">
+            <div class="section-title">
+                <h2>Grade 11 Prerequisites (20-Level)</h2>
+                <span class="badge-info">Early Wave Focus</span>
+            </div>
 
-        <div class="subject-grid">
-            <!-- Subject 1: ELA -->
-            <div class="subject-row">
-                <div class="subject-info">
-                    <div class="subject-name">ELA 30-1</div>
-                    <div class="subject-sub">Weight: 1.00x</div>
-                </div>
-                <div class="controls-group">
-                    <button type="button" class="toggle-btn" id="btn-ela" onclick="toggleAP('ela')">Standard (-1)</button>
-                    <div class="grade-input-wrapper">
-                        <input type="number" id="grade-ela" value="82" min="0" max="100" oninput="calculateAdmissions()">
-                        <span class="unit">%</span>
+            <p class="section-description">
+                Toggle courses to <strong>AP Version</strong> if you took an AP-prep module or AP exam in Grade 11. Adjust both sliders and number inputs in real time.
+            </p>
+
+            <form id="admissionForm" onsubmit="event.preventDefault();">
+                <div class="subject-grid">
+                    
+                    <!-- Subject 1: ELA 20-1 -->
+                    <div class="subject-row" id="row-ela20">
+                        <div class="subject-info">
+                            <label for="grade-ela20" class="subject-name">ELA 20-1</label>
+                            <span class="subject-meta">Required Core • Weight: 1.00x</span>
+                        </div>
+                        <div class="controls-group">
+                            <button type="button" class="toggle-btn" id="btn-ela20" onclick="toggleAP('ela20')">
+                                Standard (-1)
+                            </button>
+                            <div class="input-controls">
+                                <input type="range" class="grade-slider" id="slider-ela20" min="0" max="100" value="82" oninput="syncFromSlider('ela20')">
+                                <div class="grade-input-wrapper">
+                                    <input type="number" id="grade-ela20" min="0" max="100" value="82" oninput="syncFromInput('ela20')">
+                                    <span class="unit">%</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
 
-            <!-- Subject 2: Math 30-1 -->
-            <div class="subject-row">
-                <div class="subject-info">
-                    <div class="subject-name">Math 30-1</div>
-                    <div class="subject-sub">STEM Weight: 1.25x</div>
-                </div>
-                <div class="controls-group">
-                    <button type="button" class="toggle-btn" id="btn-math30_1" onclick="toggleAP('math30_1')">Standard (-1)</button>
-                    <div class="grade-input-wrapper">
-                        <input type="number" id="grade-math30_1" value="88" min="0" max="100" oninput="calculateAdmissions()">
-                        <span class="unit">%</span>
+                    <!-- Subject 2: Math 20-1 -->
+                    <div class="subject-row" id="row-math20_1">
+                        <div class="subject-info">
+                            <label for="grade-math20_1" class="subject-name">Math 20-1</label>
+                            <span class="subject-meta">STEM Core • Weight: 1.25x</span>
+                        </div>
+                        <div class="controls-group">
+                            <button type="button" class="toggle-btn" id="btn-math20_1" onclick="toggleAP('math20_1')">
+                                Standard (-1)
+                            </button>
+                            <div class="input-controls">
+                                <input type="range" class="grade-slider" id="slider-math20_1" min="0" max="100" value="88" oninput="syncFromSlider('math20_1')">
+                                <div class="grade-input-wrapper">
+                                    <input type="number" id="grade-math20_1" min="0" max="100" value="88" oninput="syncFromInput('math20_1')">
+                                    <span class="unit">%</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
 
-            <!-- Subject 3: Math 31 -->
-            <div class="subject-row">
-                <div class="subject-info">
-                    <div class="subject-name">Math 31 / Calculus</div>
-                    <div class="subject-sub">STEM Weight: 1.25x</div>
-                </div>
-                <div class="controls-group">
-                    <button type="button" class="toggle-btn" id="btn-math31" onclick="toggleAP('math31')">Standard (-1)</button>
-                    <div class="grade-input-wrapper">
-                        <input type="number" id="grade-math31" value="86" min="0" max="100" oninput="calculateAdmissions()">
-                        <span class="unit">%</span>
+                    <!-- Subject 3: Chemistry 20 -->
+                    <div class="subject-row" id="row-chem20">
+                        <div class="subject-info">
+                            <label for="grade-chem20" class="subject-name">Chemistry 20</label>
+                            <span class="subject-meta">Science Core • Weight: 1.15x</span>
+                        </div>
+                        <div class="controls-group">
+                            <button type="button" class="toggle-btn" id="btn-chem20" onclick="toggleAP('chem20')">
+                                Standard (-1)
+                            </button>
+                            <div class="input-controls">
+                                <input type="range" class="grade-slider" id="slider-chem20" min="0" max="100" value="84" oninput="syncFromSlider('chem20')">
+                                <div class="grade-input-wrapper">
+                                    <input type="number" id="grade-chem20" min="0" max="100" value="84" oninput="syncFromInput('chem20')">
+                                    <span class="unit">%</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
 
-            <!-- Subject 4: Chemistry 30 -->
-            <div class="subject-row">
-                <div class="subject-info">
-                    <div class="subject-name">Chemistry 30</div>
-                    <div class="subject-sub">Science Weight: 1.10x</div>
-                </div>
-                <div class="controls-group">
-                    <button type="button" class="toggle-btn" id="btn-chem" onclick="toggleAP('chem')">Standard (-1)</button>
-                    <div class="grade-input-wrapper">
-                        <input type="number" id="grade-chem" value="84" min="0" max="100" oninput="calculateAdmissions()">
-                        <span class="unit">%</span>
+                    <!-- Subject 4: Physics 20 -->
+                    <div class="subject-row" id="row-phys20">
+                        <div class="subject-info">
+                            <label for="grade-phys20" class="subject-name">Physics 20</label>
+                            <span class="subject-meta">Science Core • Weight: 1.15x</span>
+                        </div>
+                        <div class="controls-group">
+                            <button type="button" class="toggle-btn" id="btn-phys20" onclick="toggleAP('phys20')">
+                                Standard (-1)
+                            </button>
+                            <div class="input-controls">
+                                <input type="range" class="grade-slider" id="slider-phys20" min="0" max="100" value="85" oninput="syncFromSlider('phys20')">
+                                <div class="grade-input-wrapper">
+                                    <input type="number" id="grade-phys20" min="0" max="100" value="85" oninput="syncFromInput('phys20')">
+                                    <span class="unit">%</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
 
-            <!-- Subject 5: Physics 30 -->
-            <div class="subject-row">
-                <div class="subject-info">
-                    <div class="subject-name">Physics 30</div>
-                    <div class="subject-sub">Science Weight: 1.10x</div>
-                </div>
-                <div class="controls-group">
-                    <button type="button" class="toggle-btn" id="btn-phys" onclick="toggleAP('phys')">Standard (-1)</button>
-                    <div class="grade-input-wrapper">
-                        <input type="number" id="grade-phys" value="85" min="0" max="100" oninput="calculateAdmissions()">
-                        <span class="unit">%</span>
+                    <!-- Subject 5: Approved 5th Subject (20-Level) -->
+                    <div class="subject-row" id="row-subj5_20">
+                        <div class="subject-info">
+                            <label for="grade-subj5_20" class="subject-name">Approved 5th Subject 20</label>
+                            <span class="subject-meta">Bio 20 / Social 20 / Language • Weight: 1.00x</span>
+                        </div>
+                        <div class="controls-group">
+                            <button type="button" class="toggle-btn" id="btn-subj5_20" onclick="toggleAP('subj5_20')">
+                                Standard (-1)
+                            </button>
+                            <div class="input-controls">
+                                <input type="range" class="grade-slider" id="slider-subj5_20" min="0" max="100" value="83" oninput="syncFromSlider('subj5_20')">
+                                <div class="grade-input-wrapper">
+                                    <input type="number" id="grade-subj5_20" min="0" max="100" value="83" oninput="syncFromInput('subj5_20')">
+                                    <span class="unit">%</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+
+                </div>
+            </form>
+        </section>
+
+        <!-- Results Display Panel -->
+        <section class="card results-card">
+            <div class="results-header">
+                <div>
+                    <span class="metric-label">EARLY ADMISSION STATUS</span>
+                    <h3 class="status-title" id="statusText">Evaluating...</h3>
+                </div>
+                <div class="chance-badge status-competitive" id="chanceDisplay">0.0%</div>
+            </div>
+
+            <div class="metrics-grid">
+                <div class="metric-box">
+                    <span class="metric-label">Unweighted 20-Level Avg</span>
+                    <span class="metric-value" id="unweightedAvgDisplay">0.0%</span>
+                </div>
+                <div class="metric-box">
+                    <span class="metric-label">Weighted / AP Boost Avg</span>
+                    <span class="metric-value" id="weightedAvgDisplay">0.0%</span>
+                </div>
+                <div class="metric-box">
+                    <span class="metric-label">AP Courses Completed</span>
+                    <span class="metric-value" id="apCountDisplay">0 / 5</span>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Results Display -->
-    <div class="card results-card">
-        <div class="results-header">
-            <div>
-                <div class="metric-label">ESTIMATED ADMISSION CHANCE</div>
-                <div class="metric-value" id="statusText">Evaluating...</div>
+            <div class="reason-box" id="reasonDisplay">
+                Loading early admission criteria...
             </div>
-            <div class="chance-badge status-competitive" id="chanceDisplay">0.0%</div>
-        </div>
 
-        <div class="metrics-grid">
-            <div class="metric-box">
-                <div class="metric-label">Unweighted Average</div>
-                <div class="metric-value" id="unweightedAvgDisplay">0.0%</div>
+            <div class="action-footer">
+                <button type="button" class="btn-copy" onclick="copyResultsSummary()">
+                    📋 Copy Summary to Clipboard
+                </button>
             </div>
-            <div class="metric-box">
-                <div class="metric-label">Weighted / AP Boost Average</div>
-                <div class="metric-value" id="weightedAvgDisplay">0.0%</div>
-            </div>
-            <div class="metric-box">
-                <div class="metric-label">Active AP Courses</div>
-                <div class="metric-value" id="apCountDisplay">0 / 5</div>
-            </div>
-        </div>
-
-        <div class="reason-box" id="reasonDisplay">
-            Enter your grades above to calculate live admission chances.
-        </div>
-    </div>
+        </section>
+    </main>
 </div>
-<script>
-    // State tracking for AP toggles (false = Standard -1, true = AP)
-    const apState = {
-        ela: false,
-        math30_1: false,
-        math31: false,
-        chem: false,
-        phys: false
-    };
 
-    // Toggle AP status and update button UI
-    function toggleAP(subjectKey) {
-        apState[subjectKey] = !apState[subjectKey];
-        const btn = document.getElementById(`btn-${subjectKey}`);
-        
-        if (apState[subjectKey]) {
-            btn.classList.add('is-ap');
-            btn.textContent = 'AP Course';
-        } else {
-            btn.classList.remove('is-ap');
-            btn.textContent = 'Standard (-1)';
-        }
-
-        calculateAdmissions();
-    }
-
-    // Core Smart Admission Prediction Logic
-    function calculateAdmissions() {
-        const isEarly = document.getElementById('earlyAdmissionToggle').checked;
-
-        // Retrieve raw numerical input values
-        const rawGrades = {
-            ela: parseFloat(document.getElementById('grade-ela').value) || 0,
-            math30_1: parseFloat(document.getElementById('grade-math30_1').value) || 0,
-            math31: parseFloat(document.getElementById('grade-math31').value) || 0,
-            chem: parseFloat(document.getElementById('grade-chem').value) || 0,
-            phys: parseFloat(document.getElementById('grade-phys').value) || 0
-        };
-
-        const subjects = Object.keys(rawGrades);
-        const minSubjectThreshold = isEarly ? 60.0 : 50.0;
-        const minFacultyAverage = 70.0;
-
-        // 1. HARD KNOCKOUT EVALUATION (Gatekeeping Rules)
-        for (let key of subjects) {
-            if (rawGrades[key] < minSubjectThreshold) {
-                renderResults({
-                    chance: 0.0,
-                    unweightedAvg: calculateUnweightedAvg(rawGrades),
-                    weightedAvg: 0.0,
-                    apCount: countActiveAP(),
-                    statusClass: 'status-rejected',
-                    statusText: 'REJECTED',
-                    reason: `Knockout Rule Triggered: Grade in ${formatSubjectName(key)} (${rawGrades[key]}%) is below the minimum required threshold of ${minSubjectThreshold}%.`
-                });
-                return;
-            }
-        }
-
-        const unweightedAvg = calculateUnweightedAvg(rawGrades);
-
-        if (unweightedAvg < minFacultyAverage) {
-            renderResults({
-                chance: 0.0,
-                unweightedAvg: unweightedAvg,
-                weightedAvg: unweightedAvg,
-                apCount: countActiveAP(),
-                statusClass: 'status-rejected',
-                statusText: 'REJECTED',
-                reason: `Overall unweighted average (${unweightedAvg.toFixed(1)}%) is below the minimum faculty eligibility threshold of 70.0%.`
-            });
-            return;
-        }
-
-        // 2. AP EVALUATION & STEM WEIGHTING
-        // Subject weights (Engineering priorities)
-        const subjectWeights = {
-            math30_1: 1.25,
-            math31: 1.25,
-            chem: 1.10,
-            phys: 1.10,
-            ela: 1.00
-        };
-
-        let totalWeightedScore = 0;
-        let totalWeight = 0;
-        let apCourseCount = 0;
-
-        for (let key of subjects) {
-            let mark = rawGrades[key];
-            
-            // Apply 1.035x AP Rigor boost if toggled ON (capped at 100%)
-            if (apState[key]) {
-                mark = Math.min(100, mark * 1.035);
-                apCourseCount++;
-            }
-
-            totalWeightedScore += mark * subjectWeights[key];
-            totalWeight += subjectWeights[key];
-        }
-
-        const weightedAvg = totalWeightedScore / totalWeight;
-
-        // 3. LOGISTIC SIGMOID PROBABILITY CURVE
-        // Base historical competitive cutoff: 88.5%
-        // Target cutoff drops by 0.8% per AP course completed
-        let targetCutoff = 88.5 - (0.8 * apCourseCount);
-        if (isEarly) targetCutoff += 1.5; // Early wave standards are slightly higher
-
-        const k = 0.38; // Curve steepness coefficient
-        let rawProb = 1 / (1 + Math.exp(-k * (weightedAvg - targetCutoff)));
-        let percentage = rawProb * 100;
-
-        // Realistic upper/lower bounds
-        if (weightedAvg >= 93.5) percentage = Math.max(percentage, 98.5);
-        if (weightedAvg < 80.0) percentage = Math.min(percentage, 1.5);
-
-        // Map status categories
-        let statusClass = 'status-risk';
-        let statusText = 'HIGH RISK';
-        let reason = 'Your average is below recent historical competitive ranges. You may be waitlisted or deferred.';
-
-        if (percentage >= 80) {
-            statusClass = 'status-strong';
-            statusText = 'STRONG CANDIDATE';
-            reason = isEarly 
-                ? 'High probability of receiving an Early Admission offer based on Grade 11 marks.' 
-                : 'Very strong candidate for a final admission offer in main selection waves.';
-        } else if (percentage >= 45) {
-            statusClass = 'status-competitive';
-            statusText = 'COMPETITIVE';
-            reason = 'You fall within the competitive pool range. Admission is likely in mid-to-late evaluation waves.';
-        }
-
-        renderResults({
-            chance: percentage,
-            unweightedAvg: unweightedAvg,
-            weightedAvg: weightedAvg,
-            apCount: apCourseCount,
-            statusClass: statusClass,
-            statusText: statusText,
-            reason: reason
-        });
-    }
-
-    // Helper functions
-    function calculateUnweightedAvg(grades) {
-        const vals = Object.values(grades);
-        return vals.reduce((a, b) => a + b, 0) / vals.length;
-    }
-
-    function countActiveAP() {
-        return Object.values(apState).filter(Boolean).length;
-    }
-
-    function formatSubjectName(key) {
-        const names = {
-            ela: 'ELA 30-1',
-            math30_1: 'Math 30-1',
-            math31: 'Math 31',
-            chem: 'Chemistry 30',
-            phys: 'Physics 30'
-        };
-        return names[key] || key;
-    }
-
-    // Render outputs to UI DOM elements
-    function renderResults(data) {
-        const chanceDisplay = document.getElementById('chanceDisplay');
-        const statusText = document.getElementById('statusText');
-        const reasonDisplay = document.getElementById('reasonDisplay');
-
-        chanceDisplay.textContent = `${data.chance.toFixed(1)}%`;
-        chanceDisplay.className = `chance-badge ${data.statusClass}`;
-
-        statusText.textContent = data.statusText;
-        statusText.className = `metric-value ${data.statusClass}`;
-
-        document.getElementById('unweightedAvgDisplay').textContent = `${data.unweightedAvg.toFixed(1)}%`;
-        document.getElementById('weightedAvgDisplay').textContent = `${data.weightedAvg.toFixed(1)}%`;
-        document.getElementById('apCountDisplay').textContent = `${data.apCount} / 5`;
-
-        reasonDisplay.textContent = data.reason;
-        if (data.statusClass === 'status-rejected') {
-            reasonDisplay.classList.add('is-rejected');
-        } else {
-            reasonDisplay.classList.remove('is-rejected');
-        }
-    }
-
-    // Initialize default calculation on page load
-    window.addEventListener('DOMContentLoaded', calculateAdmissions);
-</script>
+<!-- External Modular JavaScript File -->
+<script src="app.js"></script>
 </body>
 </html>
